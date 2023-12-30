@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 
+import db from '@pbvision/firestore-orm'
 import S from '@pbvision/schema'
-import db from 'firestore-orm'
 import { v4 as uuidv4 } from 'uuid'
 
 import { DatabaseAPI } from '../src/index.js'

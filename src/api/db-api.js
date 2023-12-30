@@ -1,4 +1,4 @@
-import db from 'firestore-orm'
+import db from '@pbvision/firestore-orm'
 
 import API from './api.js'
 

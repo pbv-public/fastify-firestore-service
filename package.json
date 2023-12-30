@@ -1,6 +1,6 @@
 {
   "name": "@pbvision/fastify-firestore-service",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Web Framework using Fastify and Firestore ORM",
   "license": "Apache-2.0",
   "type": "module",
@@ -13,7 +13,7 @@
     "debug": "./node_modules/nodemon/bin/nodemon.js --no-lazy --legacy-watch --watch ./src --watch ./examples --watch ./test --inspect=9229 ./node_modules/jest/bin/jest.js --coverage --config=./jest.config.json --runInBand",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config=./jest.config.json --coverage",
     "setup": "yarn install --frozen-lockfile && pip install -r requirements.txt",
-    "start-local-db": "./node_modules/firestore-orm/scripts/start-local-db.sh"
+    "start-local-db": "./node_modules/@pbvision/firestore-orm/scripts/start-local-db.sh"
   },
   "contributors": [
     "David Underhill",
