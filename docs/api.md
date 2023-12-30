@@ -56,7 +56,7 @@ class WhatTimeIsItAPI extends API {
 ## API Input Data
 APIs can receive input data from a JSON-formatted HTTP request body. API
 input MUST ALWAYS be validated. To streamline this, API inputs must be
-described using [Todea schema](https://github.com/pocketgems/schema) (`S`)
+described using [Schema](https://github.com/pbv-public/js-schema) (`S`)
 like this:
 ```javascript <!-- embed:../examples/docs.js:scope:AddNumbersAPI -->
 class AddNumbersAPI extends API {
@@ -207,7 +207,7 @@ This library defines several exceptions classes, for example:
 
 These exceptions are exported in the `EXCEPTIONS` variable.
 ```javascript
-import { EXCEPTIONS } from 'dound/fastify-app'
+import { EXCEPTIONS } from '@pbvision/fastify-firestore-service'
 const { UnauthorizedException } = EXCEPTIONS
 ```
 
@@ -271,7 +271,7 @@ class NonStandardResponse extends RequestDone {
 
 ## Database Transactions
 `DatabaseAPI` wraps your request in a database transaction context from the
-[Firestore ORM library](https://github.com/dound/firestore-orm):
+[Firestore ORM library](https://github.com/pbv-public/firestore-orm):
 ```javascript
 class SomeAPI extends DatabaseAPI {
   static IS_READ_ONLY = false

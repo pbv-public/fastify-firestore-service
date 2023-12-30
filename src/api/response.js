@@ -1,4 +1,4 @@
-import S from '@pocketgems/schema'
+import S from '@pbvision/schema'
 
 const RESPONSES = {
   NO_OUTPUT: S.str.max(0).lock(),

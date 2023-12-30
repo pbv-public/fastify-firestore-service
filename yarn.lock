@@ -1424,28 +1424,41 @@
   dependencies:
     "@noble/hashes" "^1.1.5"
 
-"@pinojs/redact@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@pinojs/redact/-/redact-0.4.0.tgz#c3de060dd12640dcc838516aa2a6803cc7b2e9d6"
-  integrity sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==
-
-"@pocketgems/schema@^0.1.2":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@pocketgems/schema/-/schema-0.1.3.tgz#9986f8e5d882886d6a6b94cbe2b5c1bc8906bf71"
-  integrity sha512-jdwGA+pZ0kQTIY1Zk1X5+9vmGI0cN0c7ZSSlUkZbQERCtgcYdzoaxmE+s3WbFWyAH0lziGaFzDy6JxvHf+ks9w==
+"@pbvision/firestore-orm@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@pbvision/firestore-orm/-/firestore-orm-0.0.3.tgz#fad61f7ee1be2b8d9398df62dd7034733dc9a2f2"
+  integrity sha512-FazjVJHcG50TazlXKT4iGP7sbH1Y5pICImC3vWNk31EPPnDNPNiuIJUAeaicMH0yiAHXcO6/B3W1b97/KZVsGg==
   dependencies:
-    ajv "^8.11.2"
+    "@google-cloud/firestore" "^7.1.0"
+    "@pbvision/schema" "^0.1.4"
+    deep-object-diff "^1.1.7"
+    fast-deep-equal "^3.1.3"
+    fast-json-stable-stringify "^2.1.0"
     rfdc "^1.1.4"
+    uuid "^8.3.2"
 
-"@pocketgems/unit-test@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@pocketgems/unit-test/-/unit-test-0.2.0.tgz#613fdf6d0f62c867af00b8e7b8ff6a9fe7760fca"
-  integrity sha512-czYaKL8XNA0jVa416lprVSo1NZlQPWS8FYlAbFKFUCzv819zPLlSUQKG7LQaK2CiNAvCOhEmOuLbCNcdJvySNw==
+"@pbvision/jest-unit-test@^0.2.0":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@pbvision/jest-unit-test/-/jest-unit-test-0.2.3.tgz#df981f26cfb9a579075a7f9cbe362de9c44b2fdb"
+  integrity sha512-oOeDpd6OPeK6YSTBcpewnEh0hJwRJwAiiddIBX3YC5nUH2z5svEbiwEXvJq9VZ21Dex+DlBULLzRh1e2eAN93w==
   dependencies:
     chalk "^4.0.0"
     chalk-table "^1.0.2"
     strip-ansi "^6.0.0"
     word-wrap "^1.2.3"
+
+"@pbvision/schema@^0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@pbvision/schema/-/schema-0.1.4.tgz#3d4e62bd5ed3cfa867b305a6ab8f4d2c0310e325"
+  integrity sha512-J2kmz/G2exwyR1Fv3mulTfr77Fl0MRsDfpVpz07ZWtaarwCtn+tJ9O6DSsvwfGRIh1ykrrzFCnKz8P4izgKF1w==
+  dependencies:
+    ajv "^8.11.2"
+    rfdc "^1.1.4"
+
+"@pinojs/redact@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@pinojs/redact/-/redact-0.4.0.tgz#c3de060dd12640dcc838516aa2a6803cc7b2e9d6"
+  integrity sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -3613,17 +3626,6 @@ find-up@^6.3.0:
   dependencies:
     locate-path "^7.1.0"
     path-exists "^5.0.0"
-
-firestore-orm@dound/firestore-orm:
-  version "0.0.2"
-  resolved "https://codeload.github.com/dound/firestore-orm/tar.gz/642a8d07ea4cc6b93fbb4c2ed30f7ae9754babb5"
-  dependencies:
-    "@google-cloud/firestore" "^7.1.0"
-    deep-object-diff "^1.1.7"
-    fast-deep-equal "^3.1.3"
-    fast-json-stable-stringify "^2.1.0"
-    rfdc "^1.1.4"
-    uuid "^8.3.2"
 
 flat-cache@^3.0.4:
   version "3.2.0"

@@ -1,7 +1,7 @@
 import zlib from 'node:zlib'
 
 import { jest } from '@jest/globals'
-import { BaseTest, runTests } from '@pocketgems/unit-test'
+import { BaseTest, runTests } from '@pbvision/jest-unit-test'
 import superagentDefaults from 'superagent-defaults'
 import supertest from 'supertest'
 

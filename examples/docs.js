@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 
-import S from '@pocketgems/schema'
+import S from '@pbvision/schema'
 
 import { API, EXCEPTIONS, RESPONSES, DatabaseAPI } from '../src/index.js'
 

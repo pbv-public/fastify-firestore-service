@@ -2,7 +2,7 @@
 This is a backend web framework built on Fastify and our Firestore ORM. It
 provides a way to define APIs, including managing data.
 
-[![JSDoc](https://img.shields.io/badge/Documentation-JSDoc-green.svg?logo=githubpages)](https://dound.github.io/fastify-firestore-service)
+[![JSDoc](https://img.shields.io/badge/Documentation-JSDoc-green.svg?logo=githubpages)](https://pbv-public.github.io/fastify-firestore-service)
 
 ## Topics <!-- omit in toc -->
 - [Key Features](#key-features)
@@ -27,14 +27,14 @@ provides a way to define APIs, including managing data.
   - Compression
   - Health check API
   - Advanced error handling
-  - Works with the [Firestore ORM library](https://github.com/dound/firestore-orm)
+  - Works with the [Firestore ORM library](https://github.com/pbv-public/firestore-orm)
 
 # Getting Started
 
 ## Creating An API
 You can create an API to fetch information from Firestore like this:
 ```js
-import { DatabaseAPI, EXCEPTIONS } from 'dound/fastify-app'
+import { DatabaseAPI, EXCEPTIONS } from '@pbvision/fastify-firestore-service'
 
 class GetOrderAPI extends DatabaseAPI {
   static PATH = '/getOrder'
@@ -65,7 +65,7 @@ You can read more about the API interface [here](docs/api.md).
 A service is just a server which hosts some HTTP APIs. To create a service, you
 call `makeService` like this:
 ```js
-import { makeService } from 'dound/fastify-app'
+import { makeService } from '@pbvision/fastify-firestore-service'
 
 const components = {
   Order,
@@ -149,7 +149,7 @@ workflow with custom components. For example, to add a new type of component
 1. Subclass `ComponentRegistrar`, and add a
    `registerExampleComponent (exampleComponent)` method
    ```js
-   import { ComponentRegistrar } from 'dound/fastify-app'
+   import { ComponentRegistrar } from '@pbvision/fastify-firestore-service'
 
    class CustomComponentRegistrar extends ComponentRegistrar {
        registerExampleComponent (exampleComponent) {

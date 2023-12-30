@@ -23,8 +23,8 @@
     "<rootDir>/test/environment.js"
   ],
   "reporters": [
-    "@pocketgems/unit-test/src/custom-reporter.js",
-    "@pocketgems/unit-test/src/summary-reporter.js"
+    "@pbvision/jest-unit-test/src/custom-reporter.js",
+    "@pbvision/jest-unit-test/src/summary-reporter.js"
   ],
   "transform": {},
   "watchPathIgnorePatterns": ["node_modules"],

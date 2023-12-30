@@ -1,6 +1,6 @@
 import assert from 'node:assert'
 
-import S from '@pocketgems/schema'
+import S from '@pbvision/schema'
 import db from 'firestore-orm'
 import { v4 as uuidv4 } from 'uuid'
 

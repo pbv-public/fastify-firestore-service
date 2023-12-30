@@ -1,4 +1,4 @@
-import S from '@pocketgems/schema'
+import S from '@pbvision/schema'
 import * as Sentry from '@sentry/node'
 import fp from 'fastify-plugin'
 

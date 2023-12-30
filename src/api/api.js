@@ -1,7 +1,7 @@
 import assert from 'node:assert'
 import querystring from 'node:querystring'
 
-import S from '@pocketgems/schema'
+import S from '@pbvision/schema'
 
 import gotWrapper from '../got-wrapper.js'
 

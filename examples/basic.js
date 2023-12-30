@@ -1,4 +1,4 @@
-import S from '@pocketgems/schema'
+import S from '@pbvision/schema'
 
 import { API, DatabaseAPI, EXCEPTIONS, RESPONSES } from '../src/index.js'
 
