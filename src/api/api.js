@@ -158,25 +158,25 @@ class API {
   static TAG = undefined
 
   /**
-   * The Todea schema describing the HTTP headers this API handles, if any.
+   * The Schema describing the HTTP headers this API handles, if any.
    * @public
    */
   static HEADERS = undefined
 
   /**
-   * The Todea schema describing the path params this API handles, if any.
+   * The Schema describing the path params this API handles, if any.
    * @public
    */
   static PATH_PARAMS = undefined
 
   /**
-   * The Todea schema describing the query string this API handles, if any.
+   * The Schema describing the query string this API handles, if any.
    * @public
    */
   static QS = undefined
 
   /**
-   * The Todea schema describing the request body this API handles. Note that
+   * The Schema describing the request body this API handles. Note that
    * GET requests should not have request bodies. Use HTTP POST requests if
    * request data size is too big to fit in the query string.
    * @public
@@ -520,7 +520,7 @@ class API {
   /**
    * Removes the required marker from any top-level properties which have a
    * default value.
-   * @param {TodeaSchema} schema a Todea schema
+   * @param {Schema} schema a Schema object
    * @private
    */
   static __makeParamsWithDefaultValuesOptional (schema) {
@@ -548,7 +548,7 @@ class API {
   static _getHeaders () {
     let headers = this.HEADERS
     if (headers) {
-      headers = headers.isTodeaSchema
+      headers = headers.isSchema
         ? headers
         : S.obj(headers)
     }
@@ -603,7 +603,7 @@ class API {
   }
 
   /**
-   * Return a mapping from status code to Todea schemas.
+   * Return a mapping from status code to Schemas.
    * @private
    */
   static _getResponseSchemas () {
@@ -680,7 +680,7 @@ class API {
   /** @private */
   static get swaggerSchema () {
     const wrapInSchema = (x) => {
-      return x.isTodeaSchema ? x : S.obj(x)
+      return x.isSchema ? x : S.obj(x)
     }
 
     // istanbul ignore next

@@ -39,11 +39,11 @@ class __RequestDone extends Error {
   }
 
   /**
-   * Gets a Todea Schema object.
+   * Gets a Schema object.
    */
   static get schema () {
     let schema = this.SCHEMA
-    if (!schema.isTodeaSchema) {
+    if (!schema.isSchema) {
       schema = S.obj(schema)
     }
     return schema

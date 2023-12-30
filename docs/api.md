@@ -93,7 +93,7 @@ Notice that inputs can be configured to use a default value if none is provided
 (see `num2`). Inputs can also be configured to just have their value be
 undefined if omitted with the `optional()` marker (see `more`).
 
-The `BODY`, `PATH_PARAMS`, `HEADERS`, and `QS` properties all support a mapping of field names to Todea Schema objects. For advanced usages like specifying a default value or description, the mapping can be replaced with an Object schema `S.obj({})`. For example:
+The `BODY`, `PATH_PARAMS`, `HEADERS`, and `QS` properties all support a mapping of field names to Schema objects. For advanced usages like specifying a default value or description, the mapping can be replaced with an Object schema `S.obj({})`. For example:
 ```javascript
 static BODY = S.obj({ a: S.str })
 ```
