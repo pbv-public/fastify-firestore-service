@@ -1,3 +1,4 @@
+import Ajv from 'ajv/dist/2020'
 import fastify from 'fastify'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -142,21 +143,34 @@ export default async function makeService (params = {}) {
   } = params
   const fastifyServerId = uuidv4()
   let requestCount = 0
+  const ajvParams = {
+    removeAdditional: false,
+    allErrors: logging.reportAllErrors,
+    useDefaults: true,
+    strictSchema: false,
+    strictRequired: true
+  }
+  const ajvObjs = {
+    coerceTypes: new Ajv({ ...ajvParams, coerceTypes: true }),
+    noCoerceTypes: new Ajv({ ...ajvParams, coerceTypes: false })
+  }
   const app = fastify({
     ignoreTrailingSlash: true,
     disableRequestLogging: true,
     logger: makeLogger(logging.useUnitTestLogFormat),
-    genReqId: () => `${fastifyServerId}-${++requestCount}`,
-    ajv: {
-      customOptions: {
-        removeAdditional: false,
-        allErrors: logging.reportAllErrors,
-        useDefaults: true,
-        strictSchema: false,
-        strictRequired: true
-      }
-    }
+    genReqId: () => `${fastifyServerId}-${++requestCount}`
   })
+    .setValidatorCompiler(({ httpPart, schema }) => {
+      // header, route, and query string always come as strings; coerce them
+      // to the correct types if possible; body should come exactly in the
+      // right type so don't allow type coercion there
+      const useCoerce = httpPart !== 'body'
+      const ajv = useCoerce ? ajvObjs.coerceTypes : ajvObjs.noCoerceTypes
+      const validate = ajv.compile(schema)
+      return (value) => !validate(value)
+        ? ({ value, error: validate.errors })
+        : ({ value })
+    })
 
   const registrar = new RegistrarCls(app, service)
 

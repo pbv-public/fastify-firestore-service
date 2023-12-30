@@ -75,7 +75,6 @@ async function checkRedirToWebApp (fastify, apiPath, app, headersToFwd = {}) {
       const decodedDataAndSig = decodeURIComponent(data.substring(cutoffIdx))
       const sigStartIdx = decodedDataAndSig.lastIndexOf('.')
       const decodedData = decodedDataAndSig.substring(0, sigStartIdx)
-      console.log(decodedData)
       const parsedData = JSON.parse(decodedData)
       expect(parsedData).toEqual({
         ...(defineCustomCookie ? { x: 7 } : {}),
