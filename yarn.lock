@@ -3571,9 +3571,9 @@ find-up@^6.3.0:
     locate-path "^7.1.0"
     path-exists "^5.0.0"
 
-firestoredb@dound/firestoredb#bcac77191aa73cc2283739ffec0fdd4df4efb826:
+firestore-orm@dound/firestore-orm#bc28276f98b184335b6623ccb104e1e3b5c5ecc0:
   version "0.0.1"
-  resolved "https://codeload.github.com/dound/firestoredb/tar.gz/bcac77191aa73cc2283739ffec0fdd4df4efb826"
+  resolved "https://codeload.github.com/dound/firestore-orm/tar.gz/bc28276f98b184335b6623ccb104e1e3b5c5ecc0"
   dependencies:
     "@google-cloud/firestore" "^7.1.0"
     deep-object-diff "^1.1.7"
