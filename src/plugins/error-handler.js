@@ -13,7 +13,7 @@ export default fp(function (fastify, options, next) {
     dsn: sentryDSN,
     enabled: isSentryEnabled,
     environment: process.env.NODE_ENV,
-    release: process.env.GIT_HASH,
+    release: `${options.errorHandler.service}@${process.env.GIT_HASH}`,
     serverName: options.errorHandler.serverName
   })
 

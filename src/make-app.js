@@ -168,7 +168,8 @@ export default async function makeService (params = {}) {
       errorHandler: {
         returnErrorDetail: logging.reportErrorDetail,
         sentryDSN: logging.sentryDSN,
-        serverName: fastifyServerId
+        serverName: fastifyServerId,
+        service
       }
     })
     .register(healthCheckPlugin, { healthCheck })
