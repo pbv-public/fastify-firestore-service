@@ -70,9 +70,10 @@ const SWAGGER_CONFIG = {
 
 /**
  * @typedef {object} LatencyTrackerConfig
- * @property {boolean} [disabled=false] Whether to add a health check endpoint
- *   that simply returns 200.
- * @property {string} [path='/'] The path to the health check endpoint.
+ * @property {boolean} [disabled=false] Whether to record how long from when we
+ *   start to process a request to when we start to send the response
+ * @property {string} [header='x-latency-ms'] response header to send the
+ *   latency info back in
  */
 const LATENCY_TRACKER_CONFIG = {
   disabled: false,
