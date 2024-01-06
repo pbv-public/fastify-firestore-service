@@ -1,4 +1,4 @@
-import Ajv from 'ajv/dist/2020'
+import Ajv from 'ajv/dist/2020.js'
 import fastify from 'fastify'
 import { v4 as uuidv4 } from 'uuid'
 
