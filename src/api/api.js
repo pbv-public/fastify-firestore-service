@@ -117,15 +117,6 @@ class API {
     return undefined
   }
 
-  /**
-   * Returns the full HTTP path to this API.
-   * @param {String} service The service this API belongs to.
-   * @public
-   */
-  static getFullPath (service) {
-    return `/${service}${this.PATH}`
-  }
-
   /* istanbul ignore next */
   /**
    * A human-readable description of what this API does. It is only used when
@@ -482,14 +473,14 @@ class API {
    * @package
    */
   static registerAPI (registrar) {
-    const { app, service } = registrar
+    const { app } = registrar
     if (this.setup) {
       app.register(this.setup)
     }
     const cls = this
     app.register(async (fastify) => {
       try {
-        await cls.registerAPIWithFastify(fastify, cls.getFullPath(service))
+        await cls.registerAPIWithFastify(fastify, cls.PATH)
       } catch (e) {
         if (e instanceof assert.AssertionError) {
           e.message = `${cls.name}: ${e.message}`
@@ -502,7 +493,7 @@ class API {
     if (this.CORS_ORIGIN) {
       // create an OPTIONS method API to support CORS preflight requests from
       // browsers
-      const path = cls.getFullPath(service)
+      const path = cls.PATH
       const { params, querystring } = cls.swaggerSchema
       const schema = { hide: true, params, querystring }
       app.options(path, { schema: pruneUndefined(schema) },

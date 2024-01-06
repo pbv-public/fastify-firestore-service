@@ -10,7 +10,7 @@ import { API, EXCEPTIONS } from '../src/index.js'
 import { BaseAppTest, mockGot, runTests } from './base-test.js'
 
 function getURI (path) {
-  return `/unittest${path}`
+  return `${path}`
 }
 
 async function checkAPIRegisterWithErr (cls, errMsgOrError, moreOptions) {

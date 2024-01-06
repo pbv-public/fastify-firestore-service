@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { BaseAppTest, runTests } from './base-test.js'
 
 function getURI (postfix) {
-  return '/unittest' + postfix
+  return '' + postfix
 }
 
 class DBLibTest extends BaseAppTest {
@@ -66,7 +66,7 @@ class DBLibTest extends BaseAppTest {
     // note: this example API is configured to retry up to 3 times
     async function check (id, delta, numTimesToRetry, failInPreCommit) {
       const shouldSucceed = numTimesToRetry <= maxRetriesToSucceed
-      const resp = await app.post('/unittest/dbWithDatabaseAPI')
+      const resp = await app.post('/dbWithDatabaseAPI')
         .set('Content-Type', 'application/json')
         .send({ id, delta, numTimesToRetry, failInPreCommit })
         .expect(shouldSucceed ? 200 : 500)
@@ -100,7 +100,7 @@ class DBLibTest extends BaseAppTest {
     const app = this.app
     let lifetimeTries = 0
     async function check (numTries) {
-      const resp = await app.post('/unittest/overshare')
+      const resp = await app.post('/overshare')
         .set('Content-Type', 'application/json')
         .send({ numTries })
         .expect(200)

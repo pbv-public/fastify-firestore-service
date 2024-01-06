@@ -1,7 +1,7 @@
 import { BaseAppTest, runTests } from './base-test.js'
 
 function getURI (path) {
-  return `/unittest${path}`
+  return `${path}`
 }
 
 class LatencyTrackerTest extends BaseAppTest {
