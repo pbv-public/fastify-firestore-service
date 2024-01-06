@@ -27,17 +27,6 @@ export default fp(function (fastify, options, next) {
     return payload
   })
 
-  fastify.addHook('onResponse', (req, reply, done) => {
-    // if errored, then it was already logged
-    if (!reply.raw.logged) {
-      req.log.info({
-        req,
-        status: reply.raw.statusCode,
-        latency: reply.getHeader(header)
-      })
-    }
-    done()
-  })
   next()
 }, {
   fastify: '>=3.x',

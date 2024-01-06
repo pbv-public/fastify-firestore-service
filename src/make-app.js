@@ -180,6 +180,10 @@ export default async function makeService (params = {}) {
       if (logger.serializers.req) {
         Object.assign(objToLog, logger.serializers.req(req))
       }
+      if (latencyTracker.header) {
+        // latency in milliseconds
+        objToLog.latency = reply.getHeader(latencyTracker.header)
+      }
       req.log.info(objToLog)
       done()
     })
