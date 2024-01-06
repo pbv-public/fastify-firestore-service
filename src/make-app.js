@@ -32,8 +32,13 @@ const COOKIE_CONFIG = {
  * @property {boolean} [reportErrorDetail=false] Whether include all details
  *   of an error. Recommend to keep it off for remote testing, on for local
  *   testing.
+ * @property {String} [sentryDSN] The Sentry DSN to report errors to
+ * @property {function} [customizePinoOpts] An optional function customize the
+ *   arguments to pass to Pino. Takes as input the options that will be sent
+ *   to be Pino by default (can be modified). Return the new options.
  */
 const LOGGING_CONFIG = {
+  customizePinoOpts: null,
   useUnitTestLogFormat: false,
   reportAllErrors: false,
   reportErrorDetail: false,
@@ -156,8 +161,8 @@ export default async function makeService (params = {}) {
   }
   const app = fastify({
     ignoreTrailingSlash: true,
-    disableRequestLogging: true,
-    logger: makeLogger(logging.useUnitTestLogFormat),
+    disableRequestLogging: false,
+    logger: makeLogger(logging.useUnitTestLogFormat, logging.customizePinoOpts),
     genReqId: () => `${fastifyServerId}-${++requestCount}`
   })
     .setValidatorCompiler(({ httpPart, schema }) => {

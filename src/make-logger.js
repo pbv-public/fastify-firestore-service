@@ -1,7 +1,6 @@
 // istanbul ignore file
 import querystring from 'node:querystring'
 
-import pino from 'pino'
 import wrap from 'word-wrap'
 
 // for unit testing, output to the console INSTEAD of to stdout
@@ -84,7 +83,7 @@ function getUnitTestLogFormatOverrides () {
   }
 }
 
-export default function makeCustomLogger (useUnitTestLogFormat) {
+export default function makeCustomLogger (useUnitTestLogFormat, customizeOpts) {
   function serializeReq (req) {
     const q = req.query
     if (req.raw) {
@@ -101,19 +100,22 @@ export default function makeCustomLogger (useUnitTestLogFormat) {
       q: q || querystring.decode(qs)
     }
   }
-  const options = {
+  customizeOpts = customizeOpts ?? (x => x)
+  const options = customizeOpts({
     base: null, // omit pino default fields like pid and hostname
-    level: (process.env.NODE_ENV === 'prod') ? 'info' : 'debug',
+    level: 'debug',
     serializers: {
       req: serializeReq,
-      res: (res) => {
-        return { status: res.statusCode, req: serializeReq(res.req) }
+      res: res => {
+        return { status: res.statusCode, req: serializeReq(res.request) }
       }
     }
-  }
+  })
   // on localhost, we customize the logs to optimize for console-based debugging
   if (useUnitTestLogFormat) {
-    Object.assign(options, getUnitTestLogFormatOverrides())
+    const f = getUnitTestLogFormatOverrides()
+    options.serializers.req = req => f(req)
+    options.serializers.res = res => f(res.request, res)
   }
-  return pino(options)
+  return options
 }
