@@ -1,23 +1,22 @@
 {
     "root": true,
     "env": {
-        "es2020": true,
+        "es2023": true,
         "browser": false,
         "commonjs": true,
-        "jest": true
+        "jest": true,
+        "node": true
     },
     "extends": [
         "eslint:recommended",
         "standard",
+        "plugin:import/recommended",
         "plugin:import/errors",
         "plugin:import/warnings"
     ],
     "plugins": [
         "import"
     ],
-    "parserOptions": {
-        "ecmaVersion": 12
-    },
     "parser": "@babel/eslint-parser",
     "rules": {
         "import/order": [
@@ -38,6 +37,14 @@
             }
         ],
         "no-var": "error",
-        "multiline-ternary": 1
+        "multiline-ternary": 1,
+        "object-shorthand": "error",
+        "import/no-unresolved": ["error", { "commonjs": true }]
+    },
+    "settings": {
+        "import/resolver": {
+            "node": {},
+            "webpack": {}
+        }
     }
 }
