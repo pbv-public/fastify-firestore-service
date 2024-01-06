@@ -175,13 +175,21 @@ export default async function makeService (params = {}) {
         : ({ value })
     })
     .addHook('onResponse', (req, reply, done) => {
-      const objToLog = { status: reply.raw.statusCode }
-      if (logger.serializers.req) {
+      let objToLog = {}
+      try {
+        objToLog = logger.serializers.res(reply.raw)
         Object.assign(objToLog, logger.serializers.req(req))
-      }
-      if (latencyTracker.header) {
-        // latency in milliseconds
-        objToLog.latency = reply.getHeader(latencyTracker.header)
+        // istanbul ignore else
+        if (latencyTracker.header) {
+          // latency in milliseconds
+          objToLog.latency = reply.getHeader(latencyTracker.header)
+        }
+      } catch (err) /* istanbul ignore next */ {
+        // crashes in onResponse() aren't reported or caught unless we do this
+        if (typeof objToLog !== 'object') {
+          objToLog = {}
+        }
+        objToLog.failedToLog = JSON.stringify(err)
       }
       req.log.info(objToLog)
       done()

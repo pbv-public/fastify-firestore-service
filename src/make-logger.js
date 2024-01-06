@@ -21,9 +21,7 @@ export function makePinoLoggerOptions (customizeOpts) {
     level: 'debug',
     serializers: {
       req: serializeReq,
-      res: res => {
-        return { status: res.statusCode, req: serializeReq(res.request) }
-      }
+      res: res => ({ status: res.statusCode })
     }
   })
   return options
