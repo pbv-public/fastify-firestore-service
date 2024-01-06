@@ -24,8 +24,6 @@ const COOKIE_CONFIG = {
 
 /**
  * @typedef {object} LoggingConfig
- * @property {boolean} [useUnitTestLogFormat=false] Whether output logs to console with
- *   pretty printing
  * @property {boolean} [reportAllErrors=false] Whether include all API
  *   validation errors in error logging. Recommend to keep it off for production,
  *   on for testing.
@@ -39,7 +37,6 @@ const COOKIE_CONFIG = {
  */
 const LOGGING_CONFIG = {
   customizePinoOpts: null,
-  useUnitTestLogFormat: false,
   reportAllErrors: false,
   reportErrorDetail: false,
   sentryDSN: null
@@ -162,7 +159,7 @@ export default async function makeService (params = {}) {
   const app = fastify({
     ignoreTrailingSlash: true,
     disableRequestLogging: false,
-    logger: makeLogger(logging.useUnitTestLogFormat, logging.customizePinoOpts),
+    logger: makeLogger(logging.customizePinoOpts),
     genReqId: () => `${fastifyServerId}-${++requestCount}`
   })
     .setValidatorCompiler(({ httpPart, schema }) => {

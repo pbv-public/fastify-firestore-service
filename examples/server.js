@@ -9,7 +9,6 @@ import makeTestApp from '../src/app.js'
 const params = {
   logging: {
     reportErrorDetail: true,
-    useUnitTestLogFormat: false,
     reportAllErrors: true
   }
 }
