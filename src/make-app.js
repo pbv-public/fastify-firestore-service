@@ -3,7 +3,7 @@ import fastify from 'fastify'
 import { v4 as uuidv4 } from 'uuid'
 
 import ComponentRegistrar from './component-registrar.js'
-import makeLogger from './make-logger.js'
+import { makePinoLoggerOptions } from './make-logger.js'
 import compressPlugin from './plugins/compress.js'
 import contentParserPlugin from './plugins/content-parser.js'
 import cookiePlugin from './plugins/cookie.js'
@@ -157,10 +157,11 @@ export default async function makeService (params = {}) {
     coerceTypes: new Ajv({ ...ajvParams, coerceTypes: true }),
     noCoerceTypes: new Ajv({ ...ajvParams, coerceTypes: false })
   }
+  const logger = makePinoLoggerOptions(logging.customizePinoOpts)
   const app = fastify({
     ignoreTrailingSlash: true,
-    disableRequestLogging: false,
-    logger: makeLogger(logging.customizePinoOpts),
+    disableRequestLogging: true,
+    logger,
     genReqId: () => `${fastifyServerId}-${++requestCount}`
   })
     .setValidatorCompiler(({ httpPart, schema }) => {
@@ -173,6 +174,14 @@ export default async function makeService (params = {}) {
       return (value) => !validate(value)
         ? ({ value, error: validate.errors })
         : ({ value })
+    })
+    .addHook('onResponse', (req, reply, done) => {
+      const objToLog = { status: reply.raw.statusCode }
+      if (logger.serializers.req) {
+        Object.assign(objToLog, logger.serializers.req(req))
+      }
+      req.log.info(objToLog)
+      done()
     })
 
   const registrar = new RegistrarCls(app, service)

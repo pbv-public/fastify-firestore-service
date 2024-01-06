@@ -1,4 +1,4 @@
-export default function makeCustomLogger (customizeOpts) {
+export function makePinoLoggerOptions (customizeOpts) {
   function serializeReq (req) {
     const q = req.query
     // istanbul ignore else
