@@ -7,7 +7,6 @@ export function makePinoLoggerOptions (customizeOpts) {
     }
     const path = req.path
     return {
-      app: req.headers['x-app'] || '',
       uid: req.headers['x-uid'] || '',
       method: req.method,
       ua: req.headers['user-agent'] || '',
