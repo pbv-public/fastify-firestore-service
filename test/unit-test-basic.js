@@ -228,7 +228,7 @@ class BasicTest extends BaseAppTest {
       code: 200,
       isOk: true
     }
-    const result = await this.app.post(getURI('/callAPIWithDefaults/'))
+    const result = await this.app.post(getURI('/callAPIWithDefaults'))
       .expect(200)
     expect(result.body).toEqual(expResp)
 

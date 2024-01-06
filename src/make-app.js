@@ -159,7 +159,6 @@ export default async function makeService (params = {}) {
   }
   const logger = makePinoLoggerOptions(logging.customizePinoOpts)
   const app = fastify({
-    ignoreTrailingSlash: true,
     disableRequestLogging: true,
     logger,
     genReqId: () => `${fastifyServerId}-${++requestCount}`
