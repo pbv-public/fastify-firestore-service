@@ -48,23 +48,34 @@ class BaseAppTest extends BaseTest {
   }
 }
 
+function makeHeadersObj (headers) {
+  return {
+    get: name => headers[name]
+  }
+}
+
 // the promise input conveniently matches the promise produced by supertest
 // so you can pass the output of app.post(), etc. as the promise here as is
 function makeGotMockValueFromPromise (promise) {
   const mockValue = new Promise(resolve => {
     promise.then(desiredHttpResponse => {
       let body = desiredHttpResponse.text || desiredHttpResponse.body || ''
+      const headers = {}
       if (typeof body !== 'string') {
         body = JSON.stringify(body)
+        headers['content-type'] = 'application/json'
       }
-      mockValue.text = async () => body
-      resolve({ statusCode: desiredHttpResponse.status || 200 })
+      resolve({
+        status: desiredHttpResponse.status || 200,
+        headers: makeHeadersObj(headers),
+        text: async () => body
+      })
     })
   })
   return mockValue
 }
 
-function makeGotMockValue (body, statusCode, callback) {
+function makeGotMockValue (body, status, callback) {
   const mockValue = new Promise(resolve => {
     // setTimeout is used so that this promise does not synchronously resolve
     // because unmocked got will NEVER return synchronously. This ensures
@@ -73,21 +84,23 @@ function makeGotMockValue (body, statusCode, callback) {
     // instead of only rejecting later when await'ed).
     // https://github.com/facebook/jest/issues/6028 (since jest 21.x)
     setTimeout(() => {
-      mockValue.text = async () => {
-        if (callback) {
-          callback()
+      const headers = {}
+      resolve({
+        status,
+        headers: makeHeadersObj(headers),
+        text: async () => {
+          if (callback) {
+            callback()
+          }
+          if (typeof body === 'string') {
+            return body
+          }
+          headers['content-type'] = 'application/json'
+          return JSON.stringify(body)
         }
-        if (typeof body === 'string') {
-          return body
-        }
-        return JSON.stringify(body)
-      }
-      resolve({ statusCode })
+      })
     }, 0)
   })
-  mockValue.text = async () => {
-    throw new Error('cannot use text() before calling await() on the response')
-  }
   return mockValue
 }
 
@@ -109,11 +122,12 @@ function mockGot () {
    */
   gotMock.mockRespWithCallback = (...callbacks) => {
     gotMock.mockImplementation(request => {
+      const { url, ...options } = request
       for (const callback of callbacks) {
         const desiredHTTPResponse = callback(request)
         if (desiredHTTPResponse === true) {
           const unmockedGot = jest.requireActual('../src/got')
-          return unmockedGot(request)
+          return unmockedGot(url, options)
         }
         if (desiredHTTPResponse) {
           if (desiredHTTPResponse.then) {

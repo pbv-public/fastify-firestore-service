@@ -181,13 +181,14 @@ class CallAPIAPI extends DatabaseAPI {
   static DESC = 'API for unit testing'
   static RESPONSE = RESPONSES.UNVALIDATED
   static HEADERS = S.obj({
-    abc: S.str.optional()
+    abc: S.str.optional(),
+    qs: S.str.optional()
   })
 
   async computeResponse () {
     return this.callAPI({
       url: 'http://nothing',
-      compress: true
+      qsParams: this.req.headers.qs ? JSON.parse(this.req.headers.qs) : undefined
     })
   }
 }

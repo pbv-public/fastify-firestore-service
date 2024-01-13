@@ -46,7 +46,7 @@
     "@sentry/node": "^7.91.0",
     "fastify": "^4.10.0",
     "fastify-plugin": "^4.5.1",
-    "got": "^14.0.0",
+    "node-fetch": "^3.3.2",
     "word-wrap": "^1.2.3"
   },
   "devDependencies": {

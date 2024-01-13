@@ -3,7 +3,7 @@ import querystring from 'node:querystring'
 
 import S from '@pbvision/schema'
 
-import gotWrapper from '../got-wrapper.js'
+import fetchWrapper from '../fetch-wrapper.js'
 
 import {
   BadRequestException,
@@ -353,8 +353,7 @@ class API {
       headers,
       method,
       url,
-      searchParams: qsParams,
-      throwHttpErrors: false
+      qsParams
     }
     // istanbul ignore if
     if (body) {
@@ -364,19 +363,22 @@ class API {
         request.json = body
       }
     }
-    const resp = gotWrapper(request)
-    const resolvedResp = await resp
+    const resp = await fetchWrapper(request)
     const ret = {
-      code: resolvedResp.statusCode
+      code: resp.status,
+      isOk: resp.status >= 200 && resp.status <= 299
     }
-    ret.isOk = (ret.code === 200)
     const respBody = await resp.text()
     if (respBody) {
-      try {
-        ret.data = JSON.parse(respBody)
-      } catch (e) {
-        // istanbul ignore next
-        throw new Error(`JSON.parse failed on ${respBody} with reason ${e}.`)
+      if (resp.headers.get('content-type')?.startsWith('application/json')) {
+        try {
+          ret.data = JSON.parse(respBody)
+        } catch (e) {
+          // istanbul ignore next
+          throw new Error(`JSON.parse failed on ${respBody} with reason ${e}.`)
+        }
+      } else {
+        ret.data = respBody
       }
     }
     return ret
