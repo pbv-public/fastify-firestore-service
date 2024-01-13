@@ -5,8 +5,6 @@ import { BaseTest, runTests } from '@pbvision/jest-unit-test'
 import superagentDefaults from 'superagent-defaults'
 import supertest from 'supertest'
 
-import makeService from '../src/app.js'
-
 let FASTIFY_CACHE
 
 afterAll(async () => {
@@ -15,7 +13,13 @@ afterAll(async () => {
 })
 
 class BaseAppTest extends BaseTest {
+  async getMakeServiceFunc () {
+    const { default: func } = await import('../src/app.js')
+    return func
+  }
+
   async beforeAll () {
+    const makeService = await this.getMakeServiceFunc()
     this.fastify = FASTIFY_CACHE ?? await makeService()
     FASTIFY_CACHE = this.fastify
 
