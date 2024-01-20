@@ -5,7 +5,13 @@ import { BaseTest, runTests } from '@pbvision/jest-unit-test'
 import superagentDefaults from 'superagent-defaults'
 import supertest from 'supertest'
 
+import fetchWrapper from '../src/fetch-wrapper.js'
+
 let FASTIFY_CACHE
+
+beforeAll(() => {
+  fetchWrapper.__mock = mockNodeFetch()
+})
 
 afterAll(async () => {
   await FASTIFY_CACHE?.close()
@@ -50,6 +56,10 @@ class BaseAppTest extends BaseTest {
       }
     })
   }
+
+  afterEach () {
+    fetchWrapper.__mock.mockReset()
+  }
 }
 
 function makeHeadersObj (headers) {
@@ -60,7 +70,7 @@ function makeHeadersObj (headers) {
 
 // the promise input conveniently matches the promise produced by supertest
 // so you can pass the output of app.post(), etc. as the promise here as is
-function makeGotMockValueFromPromise (promise) {
+function makeNodeFetchMockValueFromPromise (promise) {
   const mockValue = new Promise(resolve => {
     promise.then(desiredHttpResponse => {
       let body = desiredHttpResponse.text || desiredHttpResponse.body || ''
@@ -79,7 +89,7 @@ function makeGotMockValueFromPromise (promise) {
   return mockValue
 }
 
-function makeGotMockValue (body, status, callback) {
+function makeNodeFetchMockValue (body, status, callback) {
   const mockValue = new Promise(resolve => {
     // setTimeout is used so that this promise does not synchronously resolve
     // because unmocked got will NEVER return synchronously. This ensures
@@ -114,7 +124,7 @@ function mockNodeFetch () {
   })
 
   nodeFetchMock.mockResp = (body = '', statusCode = 200, callback) => {
-    nodeFetchMock.mockReturnValue(makeGotMockValue(body, statusCode, callback))
+    nodeFetchMock.mockReturnValue(makeNodeFetchMockValue(body, statusCode, callback))
   }
 
   /**
@@ -130,14 +140,14 @@ function mockNodeFetch () {
       for (const callback of callbacks) {
         const desiredHTTPResponse = callback(request)
         if (desiredHTTPResponse === true) {
-          const unmockedGot = jest.requireActual('../src/got')
-          return unmockedGot(url, options)
+          const unmockedFetch = jest.requireActual('../src/got')
+          return unmockedFetch(url, options)
         }
         if (desiredHTTPResponse) {
           if (desiredHTTPResponse.then) {
-            return makeGotMockValueFromPromise(desiredHTTPResponse)
+            return makeNodeFetchMockValueFromPromise(desiredHTTPResponse)
           }
-          return makeGotMockValue(
+          return makeNodeFetchMockValue(
             // follows the names from supertest
             desiredHTTPResponse.text || desiredHTTPResponse.body || '',
             desiredHTTPResponse.status || 200)
@@ -167,6 +177,5 @@ function mockNodeFetch () {
 export {
   BaseAppTest,
   BaseTest,
-  mockNodeFetch,
   runTests
 }
