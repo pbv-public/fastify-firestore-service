@@ -19,7 +19,7 @@ import swaggerPlugin from './plugins/swagger.js'
  */
 const COOKIE_CONFIG = {
   disabled: false,
-  secret: undefined
+  secret: null
 }
 
 /**
