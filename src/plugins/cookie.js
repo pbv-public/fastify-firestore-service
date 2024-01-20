@@ -3,7 +3,7 @@ import fp from 'fastify-plugin'
 
 function addCookiePlugin (fastify, options, next) {
   // istanbul ignore if
-  if (options.cookie.disabled) {
+  if (options.cookie.disabled || !options.cookie.secret) {
     next()
     return
   }
