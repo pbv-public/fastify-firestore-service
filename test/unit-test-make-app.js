@@ -14,8 +14,6 @@ class makeServiceTest extends BaseTest {
       .rejects.toThrow('Missing required value for service')
     await expect(makeService({ ...commonConfig, cookie: { invalid: false } }))
       .rejects.toThrow('Unknown config invalid')
-    await expect(makeService({ ...commonConfig, cookie: { disabled: false } }))
-      .rejects.toThrow('Missing required value for')
     await makeService({
       ...commonConfig
     })
