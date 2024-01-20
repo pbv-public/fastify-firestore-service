@@ -108,13 +108,13 @@ function makeGotMockValue (body, status, callback) {
   return mockValue
 }
 
-function mockGot () {
-  const gotMock = jest.fn().mockImplementation(({ body }) => {
+function mockNodeFetch () {
+  const nodeFetchMock = jest.fn().mockImplementation(({ body }) => {
     expect(body).toEqual(zlib.brotliCompressSync('321'))
   })
 
-  gotMock.mockResp = (body = '', statusCode = 200, callback) => {
-    gotMock.mockReturnValue(makeGotMockValue(body, statusCode, callback))
+  nodeFetchMock.mockResp = (body = '', statusCode = 200, callback) => {
+    nodeFetchMock.mockReturnValue(makeGotMockValue(body, statusCode, callback))
   }
 
   /**
@@ -124,8 +124,8 @@ function mockGot () {
    *   to check and see if they have a mock response to use; if no callback,
    *   provides a mock response then an error will be thrown
    */
-  gotMock.mockRespWithCallback = (...callbacks) => {
-    gotMock.mockImplementation(request => {
+  nodeFetchMock.mockRespWithCallback = (...callbacks) => {
+    nodeFetchMock.mockImplementation(request => {
       const { url, ...options } = request
       for (const callback of callbacks) {
         const desiredHTTPResponse = callback(request)
@@ -148,11 +148,11 @@ function mockGot () {
   }
 
   // will respond to the next N requests with the specified N responses
-  gotMock.mockRespMulti = (...responses) => {
+  nodeFetchMock.mockRespMulti = (...responses) => {
     let idx = 0
     function setupNextResponse () {
       if (idx < responses.length) {
-        gotMock.mockResp(...responses[idx], setupNextResponse)
+        nodeFetchMock.mockResp(...responses[idx], setupNextResponse)
       } else if (idx > responses.length) {
         // exactly equal means we just got our last callback (okay)
         throw new Error('more requests made than we had mock responses')
@@ -161,12 +161,12 @@ function mockGot () {
     }
     setupNextResponse()
   }
-  return gotMock
+  return nodeFetchMock
 }
 
 export {
   BaseAppTest,
   BaseTest,
-  mockGot,
+  mockNodeFetch,
   runTests
 }

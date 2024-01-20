@@ -7,7 +7,7 @@ import { RequestValidationAPI } from '../examples/basic.js'
 import fetchWrapper from '../src/fetch-wrapper.js'
 import { API, EXCEPTIONS } from '../src/index.js'
 
-import { BaseAppTest, mockGot, runTests } from './base-test.js'
+import { BaseAppTest, mockNodeFetch, runTests } from './base-test.js'
 
 function getURI (path) {
   return `${path}`
@@ -91,7 +91,7 @@ async function checkRedirToWebApp (fastify, apiPath, app, headersToFwd = {}) {
 
 class BasicTest extends BaseAppTest {
   beforeEach () {
-    fetchWrapper.__mock = mockGot()
+    fetchWrapper.__mock = mockNodeFetch()
   }
 
   afterEach () {
