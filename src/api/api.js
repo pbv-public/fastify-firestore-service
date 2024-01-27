@@ -341,7 +341,7 @@ class API {
    * @protected
    */
   async callAPI ({
-    method = 'POST', headers = {}, url, body, qsParams
+    method = 'POST', headers = {}, url, body, qsParams, ignoreRespBody = false
   }) {
     headers = {
       ...headers,
@@ -366,17 +366,19 @@ class API {
       code: resp.status,
       isOk: resp.status >= 200 && resp.status <= 299
     }
-    const respBody = await resp.text()
-    if (respBody) {
-      if (resp.headers.get('content-type')?.startsWith('application/json')) {
-        try {
-          ret.data = JSON.parse(respBody)
-        } catch (e) {
-          // istanbul ignore next
-          throw new Error(`JSON.parse failed on ${respBody} with reason ${e}.`)
+    if (!ignoreRespBody) {
+      const respBody = await resp.text()
+      if (respBody) {
+        if (resp.headers.get('content-type')?.startsWith('application/json')) {
+          try {
+            ret.data = JSON.parse(respBody)
+          } catch (e) {
+            // istanbul ignore next
+            throw new Error(`JSON.parse failed on ${respBody} with reason ${e}.`)
+          }
+        } else {
+          ret.data = respBody
         }
-      } else {
-        ret.data = respBody
       }
     }
     return ret

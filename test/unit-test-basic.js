@@ -101,6 +101,20 @@ class BasicTest extends BaseAppTest {
     expect(ret.body.data).toEqual({})
   }
 
+  async testCallAPIAndIgnoreBody () {
+    // Empty body should be ignored even if content type is application/json
+    const mockedFetch = this.fetchMock
+    mockedFetch.mockResp({})
+    const ret = await this.app.post(getURI('/callAPIBodyNotNeeded'))
+      .set({
+        'content-type': 'application/json'
+      })
+      .expect(200)
+    expect(ret.body.isOk).toBe(true)
+    expect(ret.body.code).toBe(200)
+    expect(Object.keys(ret.body).length).toBe(2) // no data
+  }
+
   async testQueryStringInAPICall () {
     // Empty body should be ignored even if content type is application/json
     const mockedFetch = this.fetchMock

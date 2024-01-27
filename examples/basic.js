@@ -202,6 +202,23 @@ class CallAPIAPI extends DatabaseAPI {
     })
   }
 }
+class CallAPINoResponseBodyNeededAPI extends DatabaseAPI {
+  static NAME = 'Test callAPI without needing response body'
+  static PATH = '/callAPIBodyNotNeeded'
+  static DESC = 'API for unit testing'
+  static RESPONSE = RESPONSES.UNVALIDATED
+  static HEADERS = S.obj({
+    abc: S.str.optional(),
+    qs: S.str.optional()
+  })
+
+  async computeResponse () {
+    return this.callAPI({
+      url: 'http://nothing',
+      ignoreRespBody: true
+    })
+  }
+}
 
 class ReturnBasicValueAPI extends DatabaseAPI {
   static NAME = 'Return a custom (non-object) value'
@@ -294,6 +311,7 @@ class AuthenticationAPI extends API {
 export {
   AuthenticationAPI,
   CallAPIAPI,
+  CallAPINoResponseBodyNeededAPI,
   DefaultValueAPI,
   MissingNoReturnValueAPI,
   MultipleResponseSchemaAPI,
