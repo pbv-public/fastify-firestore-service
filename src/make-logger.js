@@ -1,7 +1,7 @@
 export function makePinoLoggerOptions (customizeOpts) {
   function serializeReq (req) {
     const q = req.query
-    const path = req.routeConfig.url
+    const path = req.routeOptions.config.url
     // istanbul ignore else
     if (req.raw) {
       req = req.raw
