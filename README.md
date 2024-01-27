@@ -14,7 +14,6 @@ provides a way to define APIs, including managing data.
 - [Components](#components)
   - [Customizing Component Registration](#customizing-component-registration)
 - [Unit testing](#unit-testing)
-  - [Setup](#setup)
 - [Generating SDKs](#generating-sdks)
   - [Swagger UI](#swagger-ui)
   - [OpenAPI SDKs](#openapi-sdks)
@@ -175,10 +174,6 @@ workflow with custom components. For example, to add a new type of component
    `makeService({ components: { ExampleComponent } })`
 
 # Unit testing
-## Setup
-Apps store data in Firestore. You must start the Firestore emulator before
-running tests. You can run `yarn start-local-db` to start the local emulator.
-
 # Generating SDKs
 ## Swagger UI
 This library generates an interactive Swagger UI for all APIs at /[service]/docs.

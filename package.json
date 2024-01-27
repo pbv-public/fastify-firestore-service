@@ -11,9 +11,10 @@
   "scripts": {
     "build-doc": "./docs/build.sh",
     "debug": "./node_modules/nodemon/bin/nodemon.js --no-lazy --legacy-watch --watch ./src --watch ./examples --watch ./test --inspect=9229 ./node_modules/jest/bin/jest.js --coverage --config=./jest.config.json --runInBand",
-    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config=./jest.config.json --coverage",
     "setup": "yarn install --frozen-lockfile && pip install -r requirements.txt",
-    "start-local-db": "./node_modules/@pbvision/firestore-orm/scripts/start-local-db.sh"
+    "start-local-db": "./node_modules/@pbvision/firestore-orm/scripts/start-local-db.sh",
+    "test": "yarn -s start-local-db && yarn -s test-without-starting-db",
+    "test-without-starting-db": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config=./jest.config.json --coverage"
   },
   "contributors": [
     "David Underhill",
@@ -41,7 +42,7 @@
     "@fastify/static": "^6.12",
     "@fastify/swagger": "^8.1.0",
     "@fastify/swagger-ui": "^2.0.1",
-    "@pbvision/firestore-orm": "^0.0.6",
+    "@pbvision/firestore-orm": "^0.0.7",
     "@pbvision/schema": "^0.2.15",
     "@sentry/node": "^7.91.0",
     "fastify": "^4.10.0",
