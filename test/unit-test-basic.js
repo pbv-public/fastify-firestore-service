@@ -189,9 +189,6 @@ class BasicTest extends BaseAppTest {
     class BadPathStartAPI extends API {
       static PATH = 'wrong/starting/character'
     }
-    class BadPathAPI extends API {
-      static PATH = '/underscores_not_ok'
-    }
     class MissingDescAPI extends API {
       static PATH = '/'
     }
@@ -206,7 +203,6 @@ class BasicTest extends BaseAppTest {
 
     await checkAPIRegisterWithErr(MissingPathAPI, 'PATH must be overridden')
     await checkAPIRegisterWithErr(BadPathStartAPI, 'API path must start with a "/"')
-    await checkAPIRegisterWithErr(BadPathAPI, 'API path should not have underscores')
     await checkAPIRegisterWithErr(MissingDescAPI, 'DESC must be overridden')
     await checkAPIRegisterWithErr(AlsoMissingDescAPI, 'DESC is missing', {
       operator: '==', expected: true

@@ -106,9 +106,7 @@ class API {
 
   /* istanbul ignore next */
   /**
-   * The HTTP path suffix used to request this API. For consistency, PATHs
-   * should use lower camel-case as in the example mentioned; they should not
-   * contain underscores.
+   * The HTTP path suffix used to request this API.
    * @public
    * @abstract
    */
@@ -732,8 +730,6 @@ class API {
     assert.ok(this.DESC, 'DESC is missing')
     assert.ok(this.PATH && this.PATH.startsWith('/'),
       'API path must start with a "/"')
-    assert.ok(this.PATH.indexOf('_') < 0,
-      'API path should not have underscores') // use camel-case
 
     // convert our proprietary schema format to the fast-json-stringify format
     const respSchemas = this._getResponseSchemas()
