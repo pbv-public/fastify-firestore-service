@@ -28,6 +28,10 @@ class BaseAppTest extends BaseTest {
   beforeEach () {
     this.fetchMock = fetchWrapper.__mock
     fetchWrapper.__mock.mockClear()
+
+    // default response is a weird error to help make it obvious the unit test
+    // author forgot to provide a custom mock value
+    this.fetchMock.mockResp('custom mock value not set', 555)
   }
 
   async beforeAll () {
@@ -121,9 +125,7 @@ function makeNodeFetchMockValue (body, status, callback) {
 }
 
 function mockNodeFetch () {
-  const nodeFetchMock = jest.fn().mockImplementation(({ body }) => {
-    expect(body).toEqual(zlib.brotliCompressSync('321'))
-  })
+  const nodeFetchMock = jest.fn().mockImplementation()
 
   nodeFetchMock.mockResp = (body = '', statusCode = 200, callback) => {
     nodeFetchMock.mockReturnValue(makeNodeFetchMockValue(body, statusCode, callback))
