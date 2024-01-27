@@ -58,6 +58,18 @@ class MockFetchTest extends BaseAppTest {
     const respData = await resp.text()
     expect(resp.status).toBe(200)
     expect(respData).toMatch(/<html/)
+
+    // real is also used when mock is not set
+    const origMock = fetchWrapper.__mock
+    delete fetchWrapper.__mock
+    const resp2 = await fetchWrapper({ method: 'GET', url: 'https://www.google.com/' })
+    try {
+      const resp2Data = await resp2.text()
+      expect(resp2.status).toBe(200)
+      expect(resp2Data).toMatch(/<html/)
+    } finally {
+      fetchWrapper.__mock = origMock
+    }
   }
 
   async testMockValueFromCallback () {
