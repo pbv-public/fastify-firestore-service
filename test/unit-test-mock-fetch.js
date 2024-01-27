@@ -1,5 +1,3 @@
-import zlib from 'node:zlib'
-
 import fetchWrapper from '../src/fetch-wrapper.js'
 
 import { BaseAppTest, runTests } from './base-test.js'
