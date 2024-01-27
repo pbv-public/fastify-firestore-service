@@ -44,7 +44,7 @@ class GetOrderAPI extends DatabaseAPI {
   static OUTPUT = {
     order: Order.Schema
   }
-  static EXCEPTIONS = {
+  static ERRORS = {
     EXCEPTIONS.NotFoundException
   }
 
