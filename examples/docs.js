@@ -24,7 +24,7 @@ class NonStandardReturnCodeAPI extends API {
   static RESPONSE = NonStandardResponse
 
   async computeResponse (req) {
-    throw new NonStandardResponse()
+    throw new NonStandardResponse({})
   }
 }
 

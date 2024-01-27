@@ -227,6 +227,11 @@ class BasicTest extends BaseAppTest {
     expect(result.text).toBe('')
   }
 
+  async testNoOpRequestOkayAPI () {
+    const result = await this.app.post(getURI('/noOpRequestOkay')).expect(200)
+    expect(result.text).toBe('')
+  }
+
   async testCallAPIWithDefaults () {
     // test default params for callAPI()
     const mockedFetch = this.fetchMock
@@ -346,14 +351,14 @@ class BasicTest extends BaseAppTest {
     for (let code = 200; code < 600; code += 100) {
       await check({ code, data: { x: 5 } }, code, '', { x: 5 })
       if (code >= 400) {
-        await check({ code, msg: 'hi' }, code, 'hi', {})
+        await check({ code, msg: 'hi' }, code, 'hi')
         await check({ code, msg: 'hi', data: { x: 5 } }, code,
           'hi', { x: 5 })
       }
     }
     await check({ code: 200 }, 200, undefined, {})
     await check({ data: { x: 5 } }, 200, undefined, { x: 5 })
-    await check({ code: 400, msg: 'ouch' }, 400, 'ouch', {})
+    await check({ code: 400, msg: 'ouch' }, 400, 'ouch')
   }
 
   async testRequiredReturnValues () {
@@ -568,8 +573,7 @@ class RequestValidationTest extends BaseAppTest {
       })
       .expect(400, {
         code: 'InvalidInputException',
-        message: 'Body Validation Failure: body/value must be string, body/anotherValue must be integer',
-        data: {}
+        message: 'Body Validation Failure: body/value must be string, body/anotherValue must be integer'
       })
   }
 
@@ -582,8 +586,7 @@ class RequestValidationTest extends BaseAppTest {
       })
       .expect(400, {
         code: 'InvalidInputException',
-        message: 'Body Validation Failure: body/value must be string',
-        data: {}
+        message: 'Body Validation Failure: body/value must be string'
       })
   }
 
@@ -591,8 +594,7 @@ class RequestValidationTest extends BaseAppTest {
     await this.makeRequest({ header: '12' })
       .expect(400, {
         code: 'InvalidInputException',
-        message: 'Header Validation Failure: headers/x-header must NOT have fewer than 4 characters',
-        data: {}
+        message: 'Header Validation Failure: headers/x-header must NOT have fewer than 4 characters'
       })
   }
 
@@ -600,8 +602,7 @@ class RequestValidationTest extends BaseAppTest {
     await this.makeRequest({ pathParam: 'ASTRING' })
       .expect(400, {
         code: 'InvalidInputException',
-        message: 'Path Validation Failure: params/aString must match pattern "^[a-z]$"',
-        data: {}
+        message: 'Path Validation Failure: params/aString must match pattern "^[a-z]$"'
       })
   }
 
@@ -609,8 +610,7 @@ class RequestValidationTest extends BaseAppTest {
     await this.makeRequest({ queryParam: 'ASTRING' })
       .expect(400, {
         code: 'InvalidInputException',
-        message: 'Query Validation Failure: querystring/param must be equal to one of the allowed values',
-        data: {}
+        message: 'Query Validation Failure: querystring/param must be equal to one of the allowed values'
       })
   }
 
@@ -622,8 +622,7 @@ class RequestValidationTest extends BaseAppTest {
     await this.makeRequest({})
       .expect(400, {
         code: 'InvalidInputException',
-        message: 'Unknown Validation Failure: hai',
-        data: {}
+        message: 'Unknown Validation Failure: hai'
       })
   }
 

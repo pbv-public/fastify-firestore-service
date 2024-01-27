@@ -7,6 +7,7 @@ import { SimpleAPI } from './simple.js'
 const {
   RequestDone,
   RequestError,
+  RequestOkay,
   ForbiddenException,
   UnauthorizedException,
   RedirectException
@@ -17,6 +18,15 @@ class NoOpAPI extends API {
   static DESC = 'Does and returns nothing'
   static TAG = null
   async computeResponse () {}
+}
+
+class NoOpUsingRequestOkayAPI extends API {
+  static PATH = '/noOpRequestOkay'
+  static DESC = 'Does and returns nothing by raising RequestOkay'
+  static TAG = null
+  async computeResponse () {
+    throw new RequestOkay()
+  }
 }
 
 class MultipleResponseSchemaAPI extends SimpleAPI {
@@ -288,6 +298,7 @@ export {
   MissingNoReturnValueAPI,
   MultipleResponseSchemaAPI,
   NoOpAPI,
+  NoOpUsingRequestOkayAPI,
   NoRequiredAPI,
   OneOptionalReturnValueAPI,
   RequestValidationAPI,

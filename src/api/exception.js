@@ -56,12 +56,13 @@ class __RequestDone extends Error {
    * @param {Integer} code An optional code to override exception's default
    *   STATUS
    */
-  constructor (message, data = {}, code = undefined) {
+  constructor (message, data = undefined, code = undefined) {
     super(message)
     this.httpCode = code ?? this.constructor.STATUS
     assert(this.httpCode !== undefined, 'Status must be defined')
-    assert(this.constructor.SCHEMA !== undefined, 'Schema must be defined')
-    this.constructor.schemaValidator(data)
+    if (this.constructor.SCHEMA !== undefined) {
+      this.constructor.schemaValidator?.(data)
+    }
     this.data = data
   }
 }
@@ -73,7 +74,21 @@ class __RequestDone extends Error {
  */
 class RequestDone extends __RequestDone {
   static STATUS = 200
-  static SCHEMA = S.obj().optional()
+  static SCHEMA = S.obj() // optional
+
+  static get schemaValidator () {
+    const orig = super.schemaValidator
+    // istanbul ignore else
+    if (this.SCHEMA === RequestDone.SCHEMA) {
+      return data => {
+        if (data !== undefined) {
+          orig(data)
+        }
+      }
+    }
+    // istanbul ignore next
+    return orig
+  }
 
   /**
    * Return data to return to caller.
@@ -87,7 +102,7 @@ class RequestDone extends __RequestDone {
    * @param {Object} data Data to return to caller
    * @param {Integer} code A status to override default status.
    */
-  constructor (data, code = undefined) {
+  constructor (data = undefined, code = undefined) {
     super(undefined, data, code)
     assert(this.httpCode < 300, 'Status code must be less than 300')
   }
@@ -104,6 +119,11 @@ class RequestDone extends __RequestDone {
  */
 class RequestOkay extends RequestDone {
   static STATUS = 200
+  // request okay response will be verified like a regular response
+  static SCHEMA = undefined
+  constructor (data = undefined) {
+    super(data, 200)
+  }
 }
 
 /**
@@ -120,9 +140,22 @@ class RequestOkay extends RequestDone {
  * @see RequestDone
  */
 class RequestError extends __RequestDone {
-  static SCHEMA = S.obj()
+  static SCHEMA = S.obj() // optional
 
-  constructor (message, data = {}, code = undefined) {
+  static get schemaValidator () {
+    const orig = super.schemaValidator
+    // istanbul ignore else
+    if (this.SCHEMA === RequestError.SCHEMA) {
+      return data => {
+        if (data !== undefined) {
+          orig(data)
+        }
+      }
+    }
+    return orig
+  }
+
+  constructor (message, data = undefined, code = undefined) {
     super(message, data, code)
     assert(this.httpCode >= 300, 'Status code must be at least 300')
   }
@@ -134,7 +167,7 @@ class RequestError extends __RequestDone {
     return S.obj({
       code: S.str,
       message: S.str.optional(),
-      data: S.obj() // Data is validated in constructor, don't validate again.
+      data: S.obj().optional() // Data is validated in constructor, don't validate again.
     })
   }
 
