@@ -1,3 +1,5 @@
+import zlib from 'node:zlib'
+
 import fetchWrapper from '../src/fetch-wrapper.js'
 
 import { BaseAppTest, runTests } from './base-test.js'
@@ -7,9 +9,46 @@ import { BaseAppTest, runTests } from './base-test.js'
 class MockFetchTest extends BaseAppTest {
   async testMustProvideSomeMockValue () {
     const mockedFetch = this.fetchMock
-    mockedFetch.mockRespWithCallback(cb => null)
+    mockedFetch.mockRespWithCallback(() => null)
     const promise = fetchWrapper({ url: '/testMustProvideSomeMockValue' })
     await expect(promise).rejects.toThrow('un-mocked fetchWrapper() request')
+  }
+
+  async testCallbackWithBodyNotCompressed () {
+    const mockedFetch = this.fetchMock
+    mockedFetch.mockRespWithCallback(request => {
+      // no compression so we just pass it as-is
+      expect(request.json).toEqual({ tbd: true })
+      return {}
+    })
+    const resp = await fetchWrapper({
+      url: '/testCallbackWithBody',
+      compress: false,
+      json: {
+        tbd: true
+      }
+    })
+    expect(resp.status).toBe(200)
+    expect(await resp.text()).toBe('')
+  }
+
+  async testCallbackWithBodyCompressed () {
+    const mockedFetch = this.fetchMock
+    mockedFetch.mockRespWithCallback(request => {
+      // the request we see in our callback should be what's passed to
+      // fetchWrapper() NOT wha tis passed to node-fetch!
+      expect(request.json).toEqual({ tbd: true })
+      return {}
+    })
+    const respWithCompression = await fetchWrapper({
+      url: '/testCallbackWithBody',
+      // compression is true by default
+      json: {
+        tbd: true
+      }
+    })
+    expect(respWithCompression.status).toBe(200)
+    expect(await respWithCompression.text()).toBe('')
   }
 
   async testDefaultMockResp () {
@@ -53,7 +92,7 @@ class MockFetchTest extends BaseAppTest {
     const mockedFetch = this.fetchMock
     // can tell the mock to allow a real request to the Internet (probably not
     // a good testing strategy, but it is supported)
-    mockedFetch.mockRespWithCallback(cb => true)
+    mockedFetch.mockRespWithCallback(() => true)
     const resp = await fetchWrapper({ method: 'GET', url: 'https://www.google.com/' })
     const respData = await resp.text()
     expect(resp.status).toBe(200)
@@ -76,7 +115,7 @@ class MockFetchTest extends BaseAppTest {
     const mockedFetch = this.fetchMock
     let numCalls = 0
     // test subsequent calls giving different responses
-    mockedFetch.mockRespWithCallback(cb => {
+    mockedFetch.mockRespWithCallback(() => {
       numCalls += 1
       // the mock can simply proxy a supertest call to some API
       if (numCalls === 1) {
