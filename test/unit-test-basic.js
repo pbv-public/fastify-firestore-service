@@ -4,7 +4,6 @@ import querystring from 'node:querystring'
 import { jest } from '@jest/globals'
 
 import { RequestValidationAPI } from '../examples/basic.js'
-import fetchWrapper from '../src/fetch-wrapper.js'
 import { API, EXCEPTIONS } from '../src/index.js'
 
 import { BaseAppTest, runTests } from './base-test.js'
@@ -92,20 +91,19 @@ async function checkRedirToWebApp (fastify, apiPath, app, headersToFwd = {}) {
 class BasicTest extends BaseAppTest {
   async testJSONContentParser () {
     // Empty body should be ignored even if content type is application/json
-    const mockedFetch = fetchWrapper.__mock
+    const mockedFetch = this.fetchMock
     mockedFetch.mockResp({})
     const ret = await this.app.post(getURI('/callAPIWithDefaults'))
       .set({
         'content-type': 'application/json'
       })
       .expect(200)
-    mockedFetch.mockReset()
     expect(ret.body.data).toEqual({})
   }
 
   async testQueryStringInAPICall () {
     // Empty body should be ignored even if content type is application/json
-    const mockedFetch = fetchWrapper.__mock
+    const mockedFetch = this.fetchMock
     mockedFetch.mockResp({})
     const qs = '{"x": 1}'
     const ret = await this.app.post(getURI('/callAPIWithDefaults'))
@@ -124,12 +122,11 @@ class BasicTest extends BaseAppTest {
       json: undefined,
       qsParams: undefined
     })
-    mockedFetch.mockReset()
   }
 
   async testEmptyQueryStringInAPICall () {
     // Empty body should be ignored even if content type is application/json
-    const mockedFetch = fetchWrapper.__mock
+    const mockedFetch = this.fetchMock
     mockedFetch.mockResp({})
     const qs = '{}'
     const ret = await this.app.post(getURI('/callAPIWithDefaults'))
@@ -148,19 +145,17 @@ class BasicTest extends BaseAppTest {
       json: undefined,
       qsParams: undefined
     })
-    mockedFetch.mockReset()
   }
 
   async testNonJSONContent () {
     // Empty body should be ignored even if content type is application/json
-    const mockedFetch = fetchWrapper.__mock
+    const mockedFetch = this.fetchMock
     mockedFetch.mockResp('xx')
     const ret = await this.app.post(getURI('/callAPIWithDefaults'))
       .set({
         'content-type': 'application/json'
       })
       .expect(200)
-    mockedFetch.mockReset()
     expect(ret.body.data).toEqual('xx')
   }
 
@@ -170,7 +165,7 @@ class BasicTest extends BaseAppTest {
   }
 
   async testParsingJsonResp () {
-    const mockedFetch = fetchWrapper.__mock
+    const mockedFetch = this.fetchMock
     mockedFetch.mockResp({})
     await this.app.post(getURI('/callAPIWithDefaults'))
       .set({
@@ -187,7 +182,6 @@ class BasicTest extends BaseAppTest {
       json: undefined,
       qsParams: undefined
     })
-    mockedFetch.mockReset()
   }
 
   async testAssertInAPIRegistration () {
@@ -239,7 +233,7 @@ class BasicTest extends BaseAppTest {
 
   async testCallAPIWithDefaults () {
     // test default params for callAPI()
-    const mockedFetch = fetchWrapper.__mock
+    const mockedFetch = this.fetchMock
     mockedFetch.mockResp('')
     const expResp = {
       code: 200,
@@ -256,12 +250,11 @@ class BasicTest extends BaseAppTest {
       json: undefined,
       qsParams: undefined
     })
-    mockedFetch.mockReset()
   }
 
   async testCallAPIWithTrailingSlashWithDefaults () {
     // test ignore trailing slash in fastify app option
-    const mockedFetch = fetchWrapper.__mock
+    const mockedFetch = this.fetchMock
     mockedFetch.mockResp('')
     const expResp = {
       code: 200,
@@ -278,7 +271,6 @@ class BasicTest extends BaseAppTest {
       json: undefined,
       qsParams: undefined
     })
-    mockedFetch.mockReset()
   }
 
   async testCheckAPINaming () {

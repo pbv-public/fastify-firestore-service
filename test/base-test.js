@@ -24,6 +24,11 @@ class BaseAppTest extends BaseTest {
     return func
   }
 
+  beforeEach () {
+    this.fetchMock = fetchWrapper.__mock
+    fetchWrapper.__mock.mockClear()
+  }
+
   async beforeAll () {
     const makeService = await this.getMakeServiceFunc()
     this.fastify = FASTIFY_CACHE ?? await makeService()
@@ -55,10 +60,6 @@ class BaseAppTest extends BaseTest {
         }
       }
     })
-  }
-
-  afterEach () {
-    fetchWrapper.__mock.mockReset()
   }
 }
 
@@ -92,8 +93,8 @@ function makeNodeFetchMockValueFromPromise (promise) {
 function makeNodeFetchMockValue (body, status, callback) {
   const mockValue = new Promise(resolve => {
     // setTimeout is used so that this promise does not synchronously resolve
-    // because unmocked got will NEVER return synchronously. This ensures
-    // functions which call got() never resolve synchronously (which can
+    // because unmocked fetch will NEVER return synchronously. This ensures
+    // functions which call fetch() never resolve synchronously (which can
     // change their behavior... e.g., allow them to throw when called,
     // instead of only rejecting later when await'ed).
     // https://github.com/facebook/jest/issues/6028 (since jest 21.x)
@@ -136,12 +137,11 @@ function mockNodeFetch () {
    */
   nodeFetchMock.mockRespWithCallback = (...callbacks) => {
     nodeFetchMock.mockImplementation(request => {
-      const { url, ...options } = request
       for (const callback of callbacks) {
         const desiredHTTPResponse = callback(request)
         if (desiredHTTPResponse === true) {
-          const unmockedFetch = jest.requireActual('../src/got')
-          return unmockedFetch(url, options)
+          const unmockedFetch = jest.requireActual('../src/fetch-wrapper.js')
+          return unmockedFetch(request)
         }
         if (desiredHTTPResponse) {
           if (desiredHTTPResponse.then) {
@@ -153,7 +153,7 @@ function mockNodeFetch () {
             desiredHTTPResponse.status || 200)
         }
       }
-      throw new Error(`un-mocked got() request: ${JSON.stringify(request)}`)
+      throw new Error(`un-mocked fetchWrapper() request: ${JSON.stringify(request)}`)
     })
   }
 
