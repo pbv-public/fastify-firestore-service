@@ -23,7 +23,10 @@
               "--runInBand"
             ],
             "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
+            "internalConsoleOptions": "neverOpen",
+            "env": {
+                "INDEBUGGER": "1"
+            }
         }
     ]
 }
