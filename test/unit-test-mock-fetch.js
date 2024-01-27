@@ -87,7 +87,17 @@ class MockFetchTest extends BaseAppTest {
       if (numCalls === 5) {
         return {}
       }
-      throw new Error('this test should not call the mock  more than 5 times')
+      if (numCalls === 6) {
+        return new Promise(resolve => {
+          return resolve({ body: { x: 6 } })
+        })
+      }
+      if (numCalls === 7) {
+        return new Promise(resolve => {
+          return resolve({})
+        })
+      }
+      throw new Error('this test should not call the mock more than 7 times')
     })
 
     // first call should just proxy the /defaultValue API
@@ -110,6 +120,16 @@ class MockFetchTest extends BaseAppTest {
     expect(resp5.status).toBe(200)
     const respData5 = await resp5.text()
     expect(respData5).toBe('')
+
+    // test custom promise (not from supertest)
+    const resp6 = await fetchWrapper({ url: '/call6' })
+    expect(resp6.status).toBe(200)
+    const respData6 = await resp6.text()
+    expect(JSON.parse(respData6)).toEqual({ x: 6 })
+    const respNoBody = await fetchWrapper({ url: '/call7' })
+    expect(respNoBody.status).toBe(200)
+    const respDataNoBody = await respNoBody.text()
+    expect(respDataNoBody).toEqual('')
   }
 }
 
