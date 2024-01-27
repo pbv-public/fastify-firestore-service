@@ -12,6 +12,14 @@ class MockFetchTest extends BaseAppTest {
     await expect(promise).rejects.toThrow('un-mocked fetchWrapper() request')
   }
 
+  async testDefaultMockResp () {
+    const mockedFetch = this.fetchMock
+    mockedFetch.mockResp()
+    const resp = await fetchWrapper({ url: '/testDefaultMockResp' })
+    expect(resp.status).toBe(200)
+    expect(await resp.text()).toBe('')
+  }
+
   async testRealAPICallToTheInternet () {
     const mockedFetch = this.fetchMock
     // can tell the mock to allow a real request to the Internet (probably not
