@@ -1442,7 +1442,7 @@
     strip-ansi "^6.0.0"
     word-wrap "^1.2.3"
 
-"@pbvision/schema@^0.2.15", "@pbvision/schema@^0.2.22":
+"@pbvision/schema@^0.2.22":
   version "0.2.29"
   resolved "https://registry.yarnpkg.com/@pbvision/schema/-/schema-0.2.29.tgz#9f303c60cfe67402bcf41ef1bb160dba4b6e36b7"
   integrity sha512-kLzLr7AcvUGw7zAISDui08rUbIKb4UIzQn2g22YI0EXVVe77HjkAcBTlaoXpGJXoybM9zmJkknWhbNPNe3W+pw==
