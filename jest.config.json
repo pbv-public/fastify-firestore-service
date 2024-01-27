@@ -1,7 +1,8 @@
 {
   "collectCoverageFrom": [
     "<rootDir>/src/**/*.js",
-    "<rootDir>/examples/**/*.js"
+    "<rootDir>/examples/**/*.js",
+    "<rootDir>/test/**/*.js"
   ],
   "coverageDirectory": "/tmp/coverage",
   "coverageReporters": ["lcov", "text", "json"],

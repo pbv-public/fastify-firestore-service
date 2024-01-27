@@ -1,3 +1,4 @@
+import querystring from 'node:querystring'
 import zlib from 'node:zlib'
 
 import { jest } from '@jest/globals'
@@ -73,15 +74,15 @@ function makeHeadersObj (headers) {
 // so you can pass the output of app.post(), etc. as the promise here as is
 function makeNodeFetchMockValueFromPromise (promise) {
   const mockValue = new Promise(resolve => {
-    promise.then(desiredHttpResponse => {
-      let body = desiredHttpResponse.text || desiredHttpResponse.body || ''
+    promise.then(httpResponse => {
+      let body = httpResponse.text || httpResponse.body || ''
       const headers = {}
       if (typeof body !== 'string') {
         body = JSON.stringify(body)
         headers['content-type'] = 'application/json'
       }
       resolve({
-        status: desiredHttpResponse.status || 200,
+        status: httpResponse.status || 200,
         headers: makeHeadersObj(headers),
         text: async () => body
       })
@@ -136,12 +137,32 @@ function mockNodeFetch () {
    *   provides a mock response then an error will be thrown
    */
   nodeFetchMock.mockRespWithCallback = (...callbacks) => {
-    nodeFetchMock.mockImplementation(request => {
+    nodeFetchMock.mockImplementation((fullURL, options) => {
+      // construct the fetchWrapper's request parameter from the fullURL and
+      // options passed as parameters to node-fetch
+      const [baseUrl, qsParams] = fullURL.split('?', 2)
+      const request = {
+        compress: options.headers['content-encoding'] === 'br',
+        method: options.method,
+        url: baseUrl,
+        qsParams: querystring.parse(qsParams),
+        headers: options.headers
+      }
+      delete request.headers['content-encoding']
+      const body = options.body
+        ? (request.compress ? options.body : zlib.brotliDecompressSync(options.body))
+        : options.body
+      if (options.headers['content-type'] === 'application/json') {
+        delete options.headers['content-type']
+        request.json = JSON.parse(body)
+      } else {
+        request.body = body // may be undefined
+      }
+
       for (const callback of callbacks) {
         const desiredHTTPResponse = callback(request)
         if (desiredHTTPResponse === true) {
-          const unmockedFetch = jest.requireActual('../src/fetch-wrapper.js')
-          return unmockedFetch(request)
+          return fetchWrapper(request, false)
         }
         if (desiredHTTPResponse) {
           if (desiredHTTPResponse.then) {
