@@ -20,6 +20,27 @@ class MockFetchTest extends BaseAppTest {
     expect(await resp.text()).toBe('')
   }
 
+  async testMockRespMulti () {
+    const mockedFetch = this.fetchMock
+    mockedFetch.mockRespMulti(
+      [], // default
+      ['custom text'],
+      ['custom code too', 222],
+      [{ x: 'json ok too' }, 223]
+    )
+    const expResponses = [
+      { text: '', code: 200 },
+      { text: 'custom text', code: 200 },
+      { text: 'custom code too', code: 222 },
+      { text: '{"x":"json ok too"}', code: 223 }
+    ]
+    for (const { text: expText, code: expCode } of expResponses) {
+      const resp = await fetchWrapper({ url: '/testMockRespMulti' })
+      expect(resp.status).toBe(expCode)
+      expect(await resp.text()).toBe(expText)
+    }
+  }
+
   async testDefaultResp () {
     const resp = await fetchWrapper({ url: '/testDefaultMockResp' })
     expect(resp.status).toBe(555)
