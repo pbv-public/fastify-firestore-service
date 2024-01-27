@@ -32,7 +32,9 @@ class MockFetchTest extends BaseAppTest {
       { text: '', code: 200 },
       { text: 'custom text', code: 200 },
       { text: 'custom code too', code: 222 },
-      { text: '{"x":"json ok too"}', code: 223 }
+      { text: '{"x":"json ok too"}', code: 223 },
+      // one too many calls!
+      { text: 'ran out of mocked responses', code: 556 }
     ]
     for (const { text: expText, code: expCode } of expResponses) {
       const resp = await fetchWrapper({ url: '/testMockRespMulti' })

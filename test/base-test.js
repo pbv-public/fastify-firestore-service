@@ -187,9 +187,9 @@ function mockNodeFetch () {
       if (idx < responses.length) {
         const [body, code] = responses[idx]
         nodeFetchMock.mockResp(body ?? '', code ?? 200, setupNextResponse)
-      } else if (idx > responses.length) {
+      } else {
         // exactly equal means we just got our last callback (okay)
-        throw new Error('more requests made than we had mock responses')
+        nodeFetchMock.mockResp('ran out of mocked responses', 556)
       }
       idx += 1
     }
