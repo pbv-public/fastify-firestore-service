@@ -1,11 +1,11 @@
 export function makePinoLoggerOptions (customizeOpts) {
   function serializeReq (req) {
     const q = req.query
+    const path = req.routeConfig.url
     // istanbul ignore else
     if (req.raw) {
       req = req.raw
     }
-    const path = req.path
     return {
       uid: req.headers['x-uid'] || '',
       method: req.method,
