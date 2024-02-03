@@ -4,7 +4,7 @@ import db from '@pbvision/firestore-orm'
 import S from '@pbvision/schema'
 import { v4 as uuidv4 } from 'uuid'
 
-import { DatabaseAPI } from '../src/index.js'
+import { DatabaseAPI, RequestDoneAbortTransaction } from '../src/index.js'
 
 import { SimpleAPI } from './simple.js'
 
@@ -46,6 +46,25 @@ class JsonSchemaData extends db.Model {
 
 class CountForTx extends db.Model {
   static FIELDS = { n: S.int.default(0) }
+}
+
+class TryAbortAPI extends DatabaseAPI {
+  static PATH = '/tryAbort'
+  static DESC = 'API that aborts the tx.'
+  static BODY = {
+    manualCode: S.int.optional()
+  }
+
+  async computeResponse (req) {
+    console.log('in compute')
+    this.tx.create(CountForTx, { id: '11111111-1111-1111-1111-111111111111', n: 9 })
+    console.log('called create')
+    if (req.body.manualCode) {
+      throw new RequestDoneAbortTransaction(req.body.manualCode)
+    } else {
+      throw new RequestDoneAbortTransaction()
+    }
+  }
 }
 
 class DBWithDatabaseAPI extends DatabaseAPI {
@@ -224,6 +243,7 @@ export {
   RememberingTooMuchAPI,
   Throw400API,
   Throw500API,
+  TryAbortAPI,
   CountForTx,
   JsonSchemaData
 }

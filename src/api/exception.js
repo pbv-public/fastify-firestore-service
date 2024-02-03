@@ -301,6 +301,7 @@ class ServiceUnavailableException extends RequestError {
 
 export {
   // Base exceptions
+  __RequestDone,
   RequestError,
   RequestDone,
 

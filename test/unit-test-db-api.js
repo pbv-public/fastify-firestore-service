@@ -1,4 +1,7 @@
+import db from '@pbvision/firestore-orm'
 import { v4 as uuidv4 } from 'uuid'
+
+import { CountForTx } from '../examples/db.js'
 
 import { BaseAppTest, runTests } from './base-test.js'
 
@@ -7,6 +10,20 @@ function getURI (postfix) {
 }
 
 class DBLibTest extends BaseAppTest {
+  async testAbort () {
+    await this.app.post('/tryAbort')
+      .send('{"manualCode": 201}')
+      .set('Content-Type', 'application/json')
+      .expect(200)
+    await this.app.post('/tryAbort')
+      .send('{}')
+      .set('Content-Type', 'application/json')
+      .expect(200)
+    expect(await db.Context.run(async tx => {
+      return await tx.get(CountForTx, '11111111-1111-1111-1111-111111111111')
+    })).toBe(undefined)
+  }
+
   async testThrow500 () {
     // Make sure custom loggers etc works.
     const result = await this.app.post(getURI('/throw500')).expect(500)

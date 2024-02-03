@@ -1,15 +1,15 @@
 import db from '@pbvision/firestore-orm'
 
 import API from './api.js'
+import { __RequestDone } from './exception.js'
 
 /**
  * Thrown to avoid committing a transaction when an error occurs.
  * @access private
  */
-class TransactionAborted extends Error {
-  constructor (respData) {
-    super()
-    this.respData = respData
+export class RequestDoneAbortTransaction extends __RequestDone {
+  constructor (code = 200, data = '') {
+    super(undefined, data, code)
     this.retryable = false
   }
 }
@@ -53,12 +53,13 @@ class DatabaseAPI extends API {
         }
         // if the response code indicates an error, then don't commit
         if (this.__reply.statusCode >= 400) {
-          throw new TransactionAborted(respData)
+          throw new RequestDoneAbortTransaction(
+            this.__reply.statusCode, respData)
         }
         return respData
       })
     } catch (e) {
-      if (e instanceof TransactionAborted) {
+      if (e instanceof RequestDoneAbortTransaction) {
         return e.respData
       } else {
         throw e
