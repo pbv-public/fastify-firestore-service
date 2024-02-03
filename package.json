@@ -42,7 +42,7 @@
     "@fastify/static": "^6.12",
     "@fastify/swagger": "^8.1.0",
     "@fastify/swagger-ui": "^2.0.1",
-    "@pbvision/firestore-orm": "^0.0.13",
+    "@pbvision/firestore-orm": "^0.0.14",
     "@sentry/node": "^7.91.0",
     "fastify": "^4.10.0",
     "fastify-plugin": "^4.5.1",
