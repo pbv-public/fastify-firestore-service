@@ -152,10 +152,6 @@ function mockNodeFetch () {
       }
       delete request.headers['content-encoding']
       const body = options.body
-        ? (request.compress
-            ? zlib.brotliDecompressSync(options.body)
-            : options.body)
-        : options.body
       if (options.headers['content-type'] === 'application/json') {
         delete options.headers['content-type']
         request.json = JSON.parse(body)

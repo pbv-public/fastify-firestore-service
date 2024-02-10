@@ -1,5 +1,3 @@
-import zlib from 'node:zlib'
-
 import { jest } from '@jest/globals'
 
 import fetchWrapper from '../src/fetch-wrapper.js'
@@ -11,7 +9,7 @@ import { BaseTest, runTests } from './base-test.js'
 class CompressionTest extends BaseTest {
   async testCompression () {
     const mock = jest.fn().mockImplementation((url, { body }) => {
-      expect(body).toEqual(zlib.brotliCompressSync('321'))
+      expect(body).toEqual('321')
     })
     await fetchWrapper({
       url: '123',
@@ -21,9 +19,9 @@ class CompressionTest extends BaseTest {
     mock.mockRestore()
 
     const mock2 = jest.fn().mockImplementation((url, { body }) => {
-      expect(body).toEqual(zlib.brotliCompressSync(JSON.stringify({
+      expect(body).toEqual(JSON.stringify({
         data: '321'
-      })))
+      }))
     })
     await fetchWrapper({
       url: '123',
@@ -57,7 +55,8 @@ class CompressionTest extends BaseTest {
 
   async testContentEncoding () {
     const mock = jest.fn().mockImplementation((url, { headers }) => {
-      expect(headers['content-encoding']).toBe('br')
+      // will be set by node-fetch not by our call to node-fetch
+      expect(headers['content-encoding']).toBe(undefined)
     })
     await fetchWrapper({
       url: '123',

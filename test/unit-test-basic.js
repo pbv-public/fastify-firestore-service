@@ -129,7 +129,7 @@ class BasicTest extends BaseAppTest {
     expect(ret.body.data).toEqual({})
     expect(mockedFetch).toHaveBeenCalledWith('http://nothing?x=1', {
       method: 'POST',
-      compress: false,
+      compress: true,
       headers: {
         qs
       },
@@ -152,7 +152,7 @@ class BasicTest extends BaseAppTest {
     expect(ret.body.data).toEqual({})
     expect(mockedFetch).toHaveBeenCalledWith('http://nothing', {
       method: 'POST',
-      compress: false,
+      compress: true,
       headers: {
         qs
       },
@@ -189,7 +189,7 @@ class BasicTest extends BaseAppTest {
       .expect(200)
     expect(mockedFetch).toHaveBeenCalledWith('http://nothing', {
       method: 'POST',
-      compress: false,
+      compress: true,
       headers: {
         abc: '123'
       },
@@ -260,7 +260,7 @@ class BasicTest extends BaseAppTest {
 
     expect(mockedFetch).toHaveBeenCalledWith('http://nothing', {
       method: 'POST',
-      compress: false,
+      compress: true,
       headers: {},
       json: undefined,
       qsParams: undefined
@@ -281,7 +281,7 @@ class BasicTest extends BaseAppTest {
 
     expect(mockedFetch).toHaveBeenCalledWith('http://nothing', {
       method: 'POST',
-      compress: false,
+      compress: true,
       headers: {},
       json: undefined,
       qsParams: undefined

@@ -1,5 +1,4 @@
 import querystring from 'node:querystring'
-import zlib from 'node:zlib'
 
 import realFetch from 'node-fetch'
 
@@ -8,16 +7,10 @@ async function fetchWrapper (request, mockedFetch) {
   let { body, headers } = request
   headers = { ...headers } // copy the headers before we change them
 
-  // compress the body using brotli
   if (json) {
     headers['content-type'] = 'application/json'
     body = JSON.stringify(request.json)
   }
-  if (body && compress) {
-    body = zlib.brotliCompressSync(body)
-    headers['content-encoding'] = 'br'
-  }
-
   const fetch = (mockedFetch === false)
     ? realFetch
     : (mockedFetch ?? fetchWrapper.__mock ?? realFetch)
@@ -30,7 +23,7 @@ async function fetchWrapper (request, mockedFetch) {
       fullURL += `?${qsStr}`
     }
   }
-  const options = { body, headers, method, compress: false }
+  const options = { body, headers, method, compress }
   return fetch(fullURL, options)
 }
 
