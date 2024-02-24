@@ -2,7 +2,7 @@ import S from '@pbvision/schema'
 import * as Sentry from '@sentry/node'
 import fp from 'fastify-plugin'
 
-import { InvalidInputException } from '../api/exception.js'
+import { InvalidInputException, __RequestDone } from '../api/exception.js'
 
 export default fp(function (fastify, options, next) {
   const isLocalhost = process.env.NODE_ENV === 'localhost'
@@ -112,11 +112,15 @@ export default fp(function (fastify, options, next) {
         url: req.url,
         status: errInfo.status
       })
-      scope.setExtras({
+      const extras = {
         msg: errInfo.message,
         reqId: req.id,
         userAgent: req.headers['user-agent'] ?? 'not set'
-      })
+      }
+      if (error instanceof __RequestDone) {
+        extras.data = error.data
+      }
+      scope.setExtras(extras)
       Sentry.captureException(error)
     })
 
