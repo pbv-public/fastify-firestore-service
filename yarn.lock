@@ -1419,10 +1419,10 @@
   dependencies:
     "@noble/hashes" "^1.1.5"
 
-"@pbvision/firestore-orm@^0.0.15":
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/@pbvision/firestore-orm/-/firestore-orm-0.0.15.tgz#b120ae77e5cfcadf43b2baf301ddb2b25ca3ee88"
-  integrity sha512-NNAre1Ggu80bxVFwCedvEZNAO6IWTMuJxD6cm9GvlUtdQpmIAv605ALljGNm7OB+6l+/AzJAbTjvIl0m3PmTqA==
+"@pbvision/firestore-orm@^0.0.16":
+  version "0.0.16"
+  resolved "https://registry.yarnpkg.com/@pbvision/firestore-orm/-/firestore-orm-0.0.16.tgz#9fe02f9331e5735da899e5d88f523dc0d0482605"
+  integrity sha512-dTQRXz0dbpa8Kc3pZt5axjyjFYnusV3GosJ2Z/iHTyMXJ3t5Z3SDRqOYHzSutVyDBfN5IHhbuvsG5Z3oKapD6A==
   dependencies:
     "@google-cloud/firestore" "^7.1.0"
     "@pbvision/schema" "^0.2.27"
