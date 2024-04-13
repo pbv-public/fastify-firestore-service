@@ -413,7 +413,7 @@ class API {
    * used if these fields don't include sensitive information.
    */
   __trackInputsWithSentry () {
-    const inputs = this.getInputsToTrackWithSentry()
+    const inputs = this.constructor.getInputsToTrackWithSentry(this.req)
     // istanbul ignore else
     if (inputs) {
       this.setSentryContext('inputs', inputs)
@@ -427,11 +427,11 @@ class API {
    * helpful debugging information but should only be
    * used if these fields don't include sensitive information.
    */
-  getInputsToTrackWithSentry () {
+  static getInputsToTrackWithSentry (req) {
     return {
-      ...this.req.query,
-      ...this.req.params,
-      ...this.req.body
+      ...req.query,
+      ...req.params,
+      ...req.body
     }
   }
 
@@ -797,7 +797,16 @@ class API {
       let ret
       try {
         if (req.validationError) {
-          req.__sentry = { context: { validationError: req.validationError } }
+          req.__sentry = { context: {} }
+          const errCopy = { ...req.validationError }
+          errCopy.validation = JSON.stringify(errCopy.validation, null, 4)
+          req.__sentry.context.validationError = errCopy
+          try {
+            req.__sentry.context.inputs = this.getInputsToTrackWithSentry(req)
+          } catch (err) {
+            // istanbul ignore next
+            console.warn('trying to get inputs to track failed', err)
+          }
           throw new InvalidInputException(req.validationError)
         }
         ret = await this._callAndHandleRequestDone(reply, async () => {
