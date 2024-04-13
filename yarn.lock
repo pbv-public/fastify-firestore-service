@@ -1550,10 +1550,10 @@
   dependencies:
     "@noble/hashes" "^1.1.5"
 
-"@pbvision/firestore-orm@^0.0.18":
-  version "0.0.18"
-  resolved "https://registry.yarnpkg.com/@pbvision/firestore-orm/-/firestore-orm-0.0.18.tgz#301709eee557133df2d965a8d16c6bfdccd3ebb1"
-  integrity sha512-t8LjtoNguvwslz0ipnQTiY+Kyc88217qddVuOHZEhBlK1bbmjC+F9Z+L5iMos6Q2w5Is/XUNHGhsdnuly5HgIA==
+"@pbvision/firestore-orm@^0.0.19":
+  version "0.0.19"
+  resolved "https://registry.yarnpkg.com/@pbvision/firestore-orm/-/firestore-orm-0.0.19.tgz#e6a13b1136fdd46886290253fc76da24115ea4f5"
+  integrity sha512-6BThsqjEi5Y5dXn3ctuv2dRZmHI/XfRWUQhYWiqq830w0G5AuE0c7tKnIjjQZKaa//yKW/IZNHCsbfN2AwQCPA==
   dependencies:
     "@google-cloud/firestore" "^7.1.0"
     "@pbvision/schema" "^0.2.29"
@@ -9228,6 +9228,11 @@ typedarray.prototype.slice@^1.0.5:
     math-intrinsics "^1.1.0"
     typed-array-buffer "^1.0.3"
     typed-array-byte-offset "^1.0.4"
+
+ua-parser-js@^1.0.37:
+  version "1.0.41"
+  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-1.0.41.tgz#bd04dc9ec830fcf9e4fad35cf22dcedd2e3b4e9c"
+  integrity sha512-LbBDqdIC5s8iROCUjMbW1f5dJQTEFB1+KO9ogbvlb3nm9n4YHa5p4KTvFPWvh2Hs8gZMBuiB1/8+pdfe/tDPug==
 
 uc.micro@^1.0.1, uc.micro@^1.0.5:
   version "1.0.6"
