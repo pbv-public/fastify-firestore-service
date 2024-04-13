@@ -2,6 +2,7 @@ import assert from 'node:assert'
 import querystring from 'node:querystring'
 
 import S from '@pbvision/schema'
+import * as Sentry from '@sentry/node'
 
 import fetchWrapper from '../fetch-wrapper.js'
 
@@ -214,6 +215,7 @@ class API {
     }
     reply.logRequestBodyOnError = this.constructor.LOG_REQUEST_BODY_ON_ERROR
     reply.apiName = this.constructor.name
+    this.__trackInputsWithSentry()
   }
 
   /**
@@ -403,6 +405,34 @@ class API {
       }
     }
     return ret
+  }
+
+  /**
+   * Adds inputs from the query string, path params and body to the Sentry
+   * context. This provides helpful debugging information but should only be
+   * used if these fields don't include sensitive information.
+   */
+  __trackInputsWithSentry () {
+    const inputs = this.getInputsToTrackWithSentry()
+    // istanbul ignore else
+    if (inputs) {
+      Sentry.setContext('inputs', inputs)
+    }
+  }
+
+  /**
+   * Returns a map of inputs to track in Sentry's context.
+   *
+   * By default, includes the query string, path params and body. This provides
+   * helpful debugging information but should only be
+   * used if these fields don't include sensitive information.
+   */
+  getInputsToTrackWithSentry () {
+    return {
+      ...this.req.query,
+      ...this.req.params,
+      ...this.req.body
+    }
   }
 
   /**

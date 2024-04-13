@@ -23,6 +23,7 @@ This library is used to define APIs.
   - [Asynchronous Processing](#asynchronous-processing)
   - [Cross Origin (CORS)](#cross-origin-cors)
   - [Calling other APIs](#calling-other-apis)
+  - [Sentry Context](#sentry-context)
 - [Niche Concepts](#niche-concepts)
   - [Other API Input Data Options](#other-api-input-data-options)
   - [Custom Middleware](#custom-middleware)
@@ -540,6 +541,13 @@ static CORS_ORIGIN = '*'
 * If you want to have one API call another, see the `callAPI()` helper method.
 * If you want to have your API redirect to a web application and optionally
   pass some information in a cookie, see the `redirectToWebApp()` helper method.
+
+
+## Sentry Context
+By default, query parameter, path parameter and body parameters are included as
+context for reports to Sentry. To disable this, set
+`MAY_SHARE_INPUTS_WITH_SENTRY` to false. Note that headers are _not_ included
+by default. You can override what's included by overriding the `getInputsToTrackWithSentry()` method.
 
 
 # Niche Concepts
