@@ -2,7 +2,6 @@ import assert from 'node:assert'
 import querystring from 'node:querystring'
 
 import S from '@pbvision/schema'
-import * as Sentry from '@sentry/node'
 
 import fetchWrapper from '../fetch-wrapper.js'
 
@@ -215,6 +214,7 @@ class API {
     }
     reply.logRequestBodyOnError = this.constructor.LOG_REQUEST_BODY_ON_ERROR
     reply.apiName = this.constructor.name
+    this.req.__sentry = { context: {}, tags: {} }
     this.__trackInputsWithSentry()
   }
 
@@ -416,7 +416,7 @@ class API {
     const inputs = this.getInputsToTrackWithSentry()
     // istanbul ignore else
     if (inputs) {
-      Sentry.setContext('inputs', inputs)
+      this.setSentryContext('inputs', inputs)
     }
   }
 
@@ -433,6 +433,21 @@ class API {
       ...this.req.params,
       ...this.req.body
     }
+  }
+
+  /** Sets context to be transmitted to Sentry if this request fails. */
+  setSentryContext (key, contextObject) {
+    this.req.__sentry.context[key] = contextObject
+  }
+
+  /** Sets a tag to be transmitted to Sentry if this request fails. */
+  setSentryTag (tag, tagValue) {
+    this.req.__sentry.tags[tag] = tagValue
+  }
+
+  /** Sets user info to be transmitted to Sentry if this request fails. */
+  setSentryUserInfo (userInfo) {
+    this.req.__sentry.userInfo = userInfo
   }
 
   /**
@@ -782,6 +797,7 @@ class API {
       let ret
       try {
         if (req.validationError) {
+          req.__sentry = { context: { validationError: req.validationError } }
           throw new InvalidInputException(req.validationError)
         }
         ret = await this._callAndHandleRequestDone(reply, async () => {

@@ -106,12 +106,20 @@ export default fp(function (fastify, options, next) {
         user.ip = req.ip
       }
       scope.setLevel(isCrash ? 'error' : 'warning')
-      scope.setUser(user)
+      scope.setUser({
+        ...user,
+        ...(req.__sentry?.userInfo ?? {})
+      })
       scope.setTags({
+        ...(req.__sentry?.tags ?? {}),
         method: req.method,
         url: req.url,
         status: errInfo.status
       })
+      const customContexts = req.__sentry?.context ?? {}
+      for (const [k, v] of Object.entries(customContexts)) {
+        scope.setContext(k, v)
+      }
       const extras = {
         msg: errInfo.message,
         reqId: req.id,

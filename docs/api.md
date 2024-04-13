@@ -227,6 +227,9 @@ class DupErrorCodeAPI extends API {
   }
 
   async computeResponse (req) {
+    this.setSentryTag('test', 'me')
+    this.setSentryTag('another', 'test')
+    this.setSentryUserInfo({ email: 'x@example.com', id: '123' })
     if (req.body.exception === 'notfound') {
       throw new NotFoundException() // default error message "Not found"
     } else {
@@ -545,9 +548,9 @@ static CORS_ORIGIN = '*'
 
 ## Sentry Context
 By default, query parameter, path parameter and body parameters are included as
-context for reports to Sentry. To disable this, set
-`MAY_SHARE_INPUTS_WITH_SENTRY` to false. Note that headers are _not_ included
-by default. You can override what's included by overriding the `getInputsToTrackWithSentry()` method.
+context for reports to Sentry. To disable or customize this, override the `getInputsToTrackWithSentry()` method. You can also use the
+`setSentryContext()`, `setSentryTag()` and `setSentryUserInfo()` methods to
+add custom metadata for the request.
 
 
 # Niche Concepts

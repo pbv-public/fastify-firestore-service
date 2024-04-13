@@ -43,6 +43,9 @@ class DupErrorCodeAPI extends API {
   }
 
   async computeResponse (req) {
+    this.setSentryTag('test', 'me')
+    this.setSentryTag('another', 'test')
+    this.setSentryUserInfo({ email: 'x@example.com', id: '123' })
     if (req.body.exception === 'notfound') {
       throw new NotFoundException() // default error message "Not found"
     } else {
