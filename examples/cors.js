@@ -1,3 +1,5 @@
+import S from '@pbvision/schema'
+
 import { API, DatabaseAPI } from '../src/index.js'
 
 class CORSTestAPI extends API {
@@ -58,6 +60,13 @@ class NotCrossOriginAPI extends CORSTestAPI {
   static PATH = '/api/cors/nope'
 }
 
+class ParamsCrossOriginAPI extends CORSTestAPI {
+  static NAME = 'has params required'
+  static PATH = '/api/cors/params'
+  static CORS_ORIGIN = '*'
+  static BODY = { n: S.int }
+}
+
 export {
   CrossAnyOriginAPI,
   CrossNoAppOriginAPI,
@@ -65,5 +74,6 @@ export {
   CrossOriginCustomHeadersAPI,
   CrossOriginNoHeadersAPI,
   CrossWebAppOriginAPI,
-  NotCrossOriginAPI
+  NotCrossOriginAPI,
+  ParamsCrossOriginAPI
 }

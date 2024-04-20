@@ -7,13 +7,13 @@ function getURI (path) {
 class CorsTest extends BaseAppTest {
   async testCORS () {
     const app = this.app
-    async function check (path, expOrigin, expHeaders) {
+    async function check (path, expOrigin, expHeaders, expCode = 200) {
       const apiPath = getURI('/api/cors/' + path)
       let req = app.post(apiPath)
       if (path === 'one') {
         req = req.set('x-key', '123')
       }
-      const resp = await req.expect(200)
+      const resp = await req.expect(expCode)
 
       function checkHeaders (headers) {
         expect(headers['access-control-allow-origin']).toEqual(expOrigin)
@@ -37,6 +37,8 @@ class CorsTest extends BaseAppTest {
     await check('webApp', 'http://localhost:3000', 'Content-Type')
     await check('headers', 'http://localhost:3000', 'X-One, X-Two')
     await check('noHeaders', 'http://localhost:3000')
+
+    await check('params', '*', 'Content-Type', 400)
   }
 }
 

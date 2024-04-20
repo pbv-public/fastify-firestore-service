@@ -258,9 +258,13 @@ class API {
    * @private
    */
   __setCORSHeaders (origin, headers) {
-    this.__reply.header('Access-Control-Allow-Origin', origin)
+    this.constructor.setCORSHeadersOnReply(this.__reply, origin, headers)
+  }
+
+  static setCORSHeadersOnReply (reply, origin, headers) {
+    reply.header('Access-Control-Allow-Origin', origin)
     if (headers && headers.length) {
-      this.__reply.header('Access-Control-Allow-Headers', headers.join(', '))
+      reply.header('Access-Control-Allow-Headers', headers.join(', '))
     }
   }
 
@@ -806,6 +810,10 @@ class API {
           } catch (err) {
             // istanbul ignore next
             console.warn('trying to get inputs to track failed', err)
+          }
+          if (this.CORS_ORIGIN) {
+            this.setCORSHeadersOnReply(
+              reply, this.getCORSOrigin(), this.CORS_HEADERS)
           }
           throw new InvalidInputException(req.validationError)
         }
