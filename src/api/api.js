@@ -420,6 +420,14 @@ class API {
     const inputs = this.constructor.getInputsToTrackWithSentry(this.req)
     // istanbul ignore else
     if (inputs) {
+      const inputsSerialized = {}
+      for (const [k, v] of Object.entries(inputs)) {
+        if (typeof v === 'object') {
+          inputsSerialized[k] = JSON.stringify(v)
+        } else {
+          inputsSerialized[k] = v
+        }
+      }
       this.setSentryContext('inputs', inputs)
     }
   }
