@@ -21,7 +21,8 @@ export default fp(function (fastify, options, next) {
   // log any exception which occurs
   fastify.setErrorHandler(async (error, req, reply) => {
     // extract the relevant bit of the traceback: remove fastify lines
-    const traceback = error.stack.split('\n')
+    // istanbul ignore next
+    const traceback = error.stack?.split('\n') ?? []
     // istanbul ignore next
     const errorMessage = error.message?.split('\n') ?? ''
     traceback.splice(0, errorMessage.length)
