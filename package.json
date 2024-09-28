@@ -1,6 +1,6 @@
 {
   "name": "@pbvision/fastify-firestore-service",
-  "version": "0.0.46",
+  "version": "0.0.47",
   "description": "Web Framework using Fastify and Firestore ORM",
   "license": "Apache-2.0",
   "type": "module",
