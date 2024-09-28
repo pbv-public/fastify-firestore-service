@@ -22,7 +22,8 @@ export default fp(function (fastify, options, next) {
   fastify.setErrorHandler(async (error, req, reply) => {
     // extract the relevant bit of the traceback: remove fastify lines
     const traceback = error.stack.split('\n')
-    const errorMessage = error.message.split('\n')
+    // istanbul ignore next
+    const errorMessage = error.message?.split('\n') ?? ''
     traceback.splice(0, errorMessage.length)
     let removeFromIdx
     if (error instanceof InvalidInputException) {
