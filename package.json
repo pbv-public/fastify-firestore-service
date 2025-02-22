@@ -1,6 +1,6 @@
 {
   "name": "@pbvision/fastify-firestore-service",
-  "version": "0.0.48",
+  "version": "0.0.49",
   "description": "Web Framework using Fastify and Firestore ORM",
   "license": "Apache-2.0",
   "type": "module",
@@ -10,11 +10,11 @@
   "exports": "./src/index.js",
   "scripts": {
     "build-doc": "./docs/build.sh",
-    "debug": "INDEBUGGER=1 ./node_modules/nodemon/bin/nodemon.js --no-lazy --legacy-watch --watch ./src --watch ./examples --watch ./test --inspect=9229 --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage --config=./jest.config.json --runInBand",
+    "debug": "GCLOUD_PROJECT=localhost-emulator INDEBUGGER=1 ./node_modules/nodemon/bin/nodemon.js --no-lazy --legacy-watch --watch ./src --watch ./examples --watch ./test --inspect=9229 --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage --config=./jest.config.json --runInBand",
     "setup": "yarn install --frozen-lockfile && pip install -r requirements.txt",
     "start-local-db": "./node_modules/@pbvision/firestore-orm/scripts/start-local-db.sh",
     "test": "yarn -s start-local-db && yarn -s test-without-starting-db",
-    "test-without-starting-db": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config=./jest.config.json --coverage"
+    "test-without-starting-db": "GCLOUD_PROJECT=localhost-emulator node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config=./jest.config.json --coverage"
   },
   "contributors": [
     "David Underhill",
@@ -42,7 +42,7 @@
     "@fastify/static": "^6.12",
     "@fastify/swagger": "^8.1.0",
     "@fastify/swagger-ui": "^2.0.1",
-    "@pbvision/firestore-orm": "^0.0.21",
+    "@pbvision/firestore-orm": "^0.0.22",
     "@sentry/node": "^7.91.0",
     "fastify": "^4.10.0",
     "fastify-plugin": "^4.5.1",
