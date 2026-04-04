@@ -181,6 +181,28 @@ class RequestError extends __RequestDone {
       data: this.data
     }
   }
+
+  /**
+   * Mark this error for rate-limited Sentry reporting. Useful when a known
+   * dependency outage causes the same error to fire repeatedly -- Cloud Tasks
+   * retries, etc. The HTTP response and logs are unaffected; only the Sentry
+   * report is throttled so the error budget doesn't get exhausted during the
+   * outage. Returns `this`, so it can be chained at the throw site:
+   *
+   *     throw new RequestError('failed to send email', { err }, 550)
+   *       .rateLimitSentry()
+   *
+   * Rate-limit keying follows the Sentry fingerprint we'd have used anyway
+   * (so Sentry grouping and our suppression agree on what "the same error" is).
+   *
+   * @param {Number} [windowMs=300000] rate-limit window in ms; at most one
+   *   Sentry report is sent per window per key (default 5 minutes).
+   * @returns {RequestError} this
+   */
+  rateLimitSentry (windowMs = 5 * 60 * 1000) {
+    this._sentryRateLimitMs = windowMs
+    return this
+  }
 }
 
 /**

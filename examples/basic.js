@@ -308,6 +308,33 @@ class AuthenticationAPI extends API {
   }
 }
 
+// Test endpoint for exercising RequestError.rateLimitSentry(): throws a 5xx
+// RequestError, optionally opted into Sentry rate limiting.
+class SentryRateLimitedAPI extends API {
+  static PATH = '/sentryRateLimited'
+  static DESC = 'Throws a RequestError, optionally rate-limited for Sentry.'
+  static BODY = {
+    message: S.str,
+    rateLimit: S.bool.optional(),
+    windowMs: S.int.min(0).optional()
+  }
+
+  static TAG = null
+
+  async computeResponse () {
+    const { message, rateLimit, windowMs } = this.req.body
+    const err = new RequestError(message, undefined, 550)
+    if (rateLimit) {
+      if (windowMs !== undefined) {
+        err.rateLimitSentry(windowMs)
+      } else {
+        err.rateLimitSentry()
+      }
+    }
+    throw err
+  }
+}
+
 export {
   AuthenticationAPI,
   CallAPIAPI,
@@ -323,5 +350,6 @@ export {
   ReturnBasicValueAPI,
   ReturnUndefinedAPI,
   ReturnViaExceptionAPI,
+  SentryRateLimitedAPI,
   SomeFakeWebAppAPI
 }

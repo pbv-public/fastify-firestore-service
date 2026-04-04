@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/node'
 import fp from 'fastify-plugin'
 
 import { InvalidInputException, __RequestDone } from '../api/exception.js'
+import { createSentryRateLimiter } from './sentry-rate-limit.js'
 
 export default fp(function (fastify, options, next) {
   const isLocalhost = process.env.NODE_ENV === 'localhost'
@@ -16,6 +17,11 @@ export default fp(function (fastify, options, next) {
     release: `${options.errorHandler.service}@${process.env.GIT_HASH ?? 'unknown'}`,
     serverName: options.errorHandler.serverName
   })
+
+  // Opt-in rate limiter: only errors flagged via RequestError.rateLimitSentry()
+  // consult this. See sentry-rate-limit.js for details.
+  const sentryRateLimiter = options.errorHandler.sentryRateLimiter ??
+    createSentryRateLimiter()
 
   const returnErrorDetail = options.errorHandler.returnErrorDetail
   // log any exception which occurs
@@ -96,43 +102,63 @@ export default fp(function (fastify, options, next) {
       reply.log.info(errInfo)
     }
 
-    Sentry.withScope(function (scope) {
-      if (customFingerprint) {
-        scope.setFingerprint(customFingerprint)
-      }
-      const user = {}
-      // istanbul ignore if
-      if (req.headers['x-uid']) {
-        user.id = req.headers['x-uid']
-      } else {
-        user.ip = req.ip
-      }
-      scope.setLevel(isCrash ? 'error' : 'warning')
-      scope.setUser({
-        ...user,
-        ...(req.__sentry?.userInfo ?? {})
+    // Check if this error is opted in to Sentry rate limiting; if so and we're
+    // inside the window, skip Sentry.captureException entirely. The HTTP
+    // response and logs are unaffected regardless.
+    let shouldCaptureToSentry = true
+    let suppressedCount = 0
+    const rateLimitMs = error._sentryRateLimitMs
+    if (rateLimitMs) {
+      const rlKey = customFingerprint || message
+      const rlResult = sentryRateLimiter.shouldReport(rlKey, rateLimitMs)
+      shouldCaptureToSentry = rlResult.report
+      suppressedCount = rlResult.suppressedCount
+    }
+
+    if (shouldCaptureToSentry) {
+      Sentry.withScope(function (scope) {
+        if (customFingerprint) {
+          scope.setFingerprint(customFingerprint)
+        }
+        const user = {}
+        // istanbul ignore if
+        if (req.headers['x-uid']) {
+          user.id = req.headers['x-uid']
+        } else {
+          user.ip = req.ip
+        }
+        scope.setLevel(isCrash ? 'error' : 'warning')
+        scope.setUser({
+          ...user,
+          ...(req.__sentry?.userInfo ?? {})
+        })
+        scope.setTags({
+          ...(req.__sentry?.tags ?? {}),
+          method: req.method,
+          url: req.url,
+          status: errInfo.status,
+          // Tag -- not extra -- so operators can filter Sentry for "issues
+          // where rate-limiting kicked in" during an outage.
+          ...(suppressedCount > 0
+            ? { suppressedSimilarEvents: String(suppressedCount) }
+            : {})
+        })
+        const customContexts = req.__sentry?.context ?? {}
+        for (const [k, v] of Object.entries(customContexts)) {
+          scope.setContext(k, v)
+        }
+        const extras = {
+          msg: errInfo.message,
+          reqId: req.id,
+          userAgent: req.headers['user-agent'] ?? 'not set'
+        }
+        if (error instanceof __RequestDone) {
+          extras.data = error.data
+        }
+        scope.setExtras(extras)
+        Sentry.captureException(error)
       })
-      scope.setTags({
-        ...(req.__sentry?.tags ?? {}),
-        method: req.method,
-        url: req.url,
-        status: errInfo.status
-      })
-      const customContexts = req.__sentry?.context ?? {}
-      for (const [k, v] of Object.entries(customContexts)) {
-        scope.setContext(k, v)
-      }
-      const extras = {
-        msg: errInfo.message,
-        reqId: req.id,
-        userAgent: req.headers['user-agent'] ?? 'not set'
-      }
-      if (error instanceof __RequestDone) {
-        extras.data = error.data
-      }
-      scope.setExtras(extras)
-      Sentry.captureException(error)
-    })
+    }
 
     const errorData = error.respData ?? {
       code: error.constructor.name,

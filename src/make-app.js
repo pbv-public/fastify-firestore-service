@@ -31,6 +31,10 @@ const COOKIE_CONFIG = {
  *   of an error. Recommend to keep it off for remote testing, on for local
  *   testing.
  * @property {String} [sentryDSN] The Sentry DSN to report errors to
+ * @property {Object} [sentryRateLimiter] Optional rate limiter instance (from
+ *   {@link createSentryRateLimiter}) to control Sentry reporting for errors
+ *   flagged via `RequestError.rateLimitSentry()`. Defaults to a fresh limiter
+ *   using the real clock; tests inject one with a controllable clock.
  * @property {function} [customizePinoOpts] An optional function customize the
  *   arguments to pass to Pino. Takes as input the options that will be sent
  *   to be Pino by default (can be modified). Return the new options.
@@ -39,7 +43,8 @@ const LOGGING_CONFIG = {
   customizePinoOpts: null,
   reportAllErrors: false,
   reportErrorDetail: false,
-  sentryDSN: null
+  sentryDSN: null,
+  sentryRateLimiter: null
 }
 
 /**
@@ -205,6 +210,7 @@ export default async function makeService (params = {}) {
       errorHandler: {
         returnErrorDetail: logging.reportErrorDetail,
         sentryDSN: logging.sentryDSN,
+        sentryRateLimiter: logging.sentryRateLimiter,
         serverName: fastifyServerId,
         service
       }
