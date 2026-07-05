@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "exports": "./src/index.js",
   "scripts": {
@@ -42,7 +42,7 @@
     "@fastify/static": "^6.12",
     "@fastify/swagger": "^8.1.0",
     "@fastify/swagger-ui": "^2.0.1",
-    "@pbvision/firestore-orm": "^0.0.22",
+    "@pbvision/firestore-orm": "^0.0.23",
     "@sentry/node": "^7.91.0",
     "fastify": "^4.10.0",
     "fastify-plugin": "^4.5.1",
@@ -65,7 +65,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-standard": "^5.0.0",
-    "firebase-tools": "^13.5.2",
+    "firebase-tools": "^14.26.0",
     "jest": "^29.7.0",
     "jsdoc": "3.6.11",
     "license-webpack-plugin": "^4.0.2",
