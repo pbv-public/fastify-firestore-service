@@ -2,7 +2,7 @@ import S from '@pbvision/schema'
 import * as Sentry from '@sentry/node'
 import fp from 'fastify-plugin'
 
-import { InvalidInputException, __RequestDone } from '../api/exception.js'
+import { InvalidInputException, RequestError, __RequestDone } from '../api/exception.js'
 import { createSentryRateLimiter } from './sentry-rate-limit.js'
 
 export default fp(function (fastify, options, next) {
@@ -102,13 +102,23 @@ export default fp(function (fastify, options, next) {
       reply.log.info(errInfo)
     }
 
-    // Check if this error is opted in to Sentry rate limiting; if so and we're
-    // inside the window, skip Sentry.captureException entirely. The HTTP
-    // response and logs are unaffected regardless.
-    let shouldCaptureToSentry = true
+    // Deliberate client errors are NOT reported to Sentry: a RequestError
+    // below 500 is an expected outcome thrown on purpose by the app (access
+    // denied, bad input, etc.), so reporting it only consumes quota -- unless
+    // the throw site opts in via RequestError.forceSentry(). Everything else
+    // is ALWAYS reported: crashes (status >= 500) and any error not thrown
+    // through our exception classes, even if it happens to carry a 4xx
+    // statusCode (e.g., a third-party HTTP client error that escaped
+    // uncaught), so unexpected errors can never be silently dropped. Errors
+    // opted in to Sentry rate limiting additionally skip capture while
+    // inside the rate-limit window. The HTTP response and logs are
+    // unaffected regardless.
+    const isExpectedClientError = !isCrash && error instanceof RequestError &&
+      error._sentryForceReport !== true
+    let shouldCaptureToSentry = !isExpectedClientError
     let suppressedCount = 0
     const rateLimitMs = error._sentryRateLimitMs
-    if (rateLimitMs) {
+    if (shouldCaptureToSentry && rateLimitMs) {
       const rlKey = customFingerprint || message
       const rlResult = sentryRateLimiter.shouldReport(rlKey, rateLimitMs)
       shouldCaptureToSentry = rlResult.report

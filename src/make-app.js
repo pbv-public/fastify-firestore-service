@@ -30,7 +30,11 @@ const COOKIE_CONFIG = {
  * @property {boolean} [reportErrorDetail=false] Whether include all details
  *   of an error. Recommend to keep it off for remote testing, on for local
  *   testing.
- * @property {String} [sentryDSN] The Sentry DSN to report errors to
+ * @property {String} [sentryDSN] The Sentry DSN to report errors to.
+ *   Deliberate client errors (a RequestError subclass with status < 500)
+ *   are skipped unless flagged via `RequestError.forceSentry()`; crashes
+ *   and errors not thrown through the exception classes are always
+ *   reported.
  * @property {Object} [sentryRateLimiter] Optional rate limiter instance (from
  *   {@link createSentryRateLimiter}) to control Sentry reporting for errors
  *   flagged via `RequestError.rateLimitSentry()`. Defaults to a fresh limiter

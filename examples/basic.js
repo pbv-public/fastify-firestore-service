@@ -308,22 +308,37 @@ class AuthenticationAPI extends API {
   }
 }
 
-// Test endpoint for exercising RequestError.rateLimitSentry(): throws a 5xx
-// RequestError, optionally opted into Sentry rate limiting.
+// Test endpoint for exercising RequestError.rateLimitSentry() and
+// RequestError.forceSentry(): throws a RequestError with a configurable
+// status code, optionally opted into Sentry rate limiting and/or forced
+// Sentry reporting.
 class SentryRateLimitedAPI extends API {
   static PATH = '/sentryRateLimited'
   static DESC = 'Throws a RequestError, optionally rate-limited for Sentry.'
   static BODY = {
     message: S.str,
     rateLimit: S.bool.optional(),
-    windowMs: S.int.min(0).optional()
+    windowMs: S.int.min(0).optional(),
+    code: S.int.min(300).optional(),
+    force: S.bool.optional(),
+    plain: S.bool.optional()
   }
 
   static TAG = null
 
   async computeResponse () {
-    const { message, rateLimit, windowMs } = this.req.body
-    const err = new RequestError(message, undefined, 550)
+    const { message, rateLimit, windowMs, code, force, plain } = this.req.body
+    if (plain) {
+      // simulates a third-party error that carries an HTTP-ish statusCode
+      // but was not thrown through our exception classes
+      const err = new Error(message)
+      err.statusCode = code ?? 550
+      throw err
+    }
+    const err = new RequestError(message, undefined, code ?? 550)
+    if (force) {
+      err.forceSentry()
+    }
     if (rateLimit) {
       if (windowMs !== undefined) {
         err.rateLimitSentry(windowMs)

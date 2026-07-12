@@ -8,7 +8,7 @@ import { BaseTest, runTests } from './base-test.js'
 // read-only, so jest.spyOn doesn't work -- jest.unstable_mockModule replaces
 // the module at import time instead.
 const mockCaptureException = jest.fn()
-const capturedScopes = [] // each entry: { tags, extras, level }
+const capturedScopes = [] // each entry: { tags, extras, level, fingerprint }
 
 jest.unstable_mockModule('@sentry/node', () => ({
   init: jest.fn(),
@@ -17,8 +17,9 @@ jest.unstable_mockModule('@sentry/node', () => ({
     const tags = {}
     const extras = {}
     let level
+    let fingerprint
     const scope = {
-      setFingerprint: () => {},
+      setFingerprint: f => { fingerprint = f },
       setLevel: l => { level = l },
       setUser: () => {},
       setTags: t => Object.assign(tags, t),
@@ -26,7 +27,7 @@ jest.unstable_mockModule('@sentry/node', () => ({
       setExtras: e => Object.assign(extras, e)
     }
     fn(scope)
-    capturedScopes.push({ tags, extras, level })
+    capturedScopes.push({ tags, extras, level, fingerprint })
   }
 }))
 
@@ -69,6 +70,12 @@ class ErrorHandlerSentryRateLimitTest extends BaseTest {
     const body = { message, rateLimit }
     if (windowMs !== undefined) body.windowMs = windowMs
     await this.app.post('/sentryRateLimited').send(body).expect(550)
+  }
+
+  async throwClientErr (message, { code = 403, force = false, rateLimit = false, windowMs } = {}) {
+    const body = { message, code, force, rateLimit }
+    if (windowMs !== undefined) body.windowMs = windowMs
+    await this.app.post('/sentryRateLimited').send(body).expect(code)
   }
 
   async testNonRateLimitedErrorIsAlwaysCaptured () {
@@ -115,6 +122,78 @@ class ErrorHandlerSentryRateLimitTest extends BaseTest {
     expect(err.rateLimitSentry()).toBe(err)
     expect(err._sentryRateLimitMs).toBe(5 * 60 * 1000)
     expect(err.rateLimitSentry(1234)._sentryRateLimitMs).toBe(1234)
+  }
+
+  async testCrashCapturedAsErrorLevel () {
+    await this.throwErr('crash err A')
+    expect(mockCaptureException).toHaveBeenCalledTimes(1)
+    expect(capturedScopes[0].level).toBe('error')
+  }
+
+  async testClientErrorNotCaptured () {
+    await this.throwClientErr('client err A', { code: 403 })
+    await this.throwClientErr('client err A', { code: 400 })
+    expect(mockCaptureException).toHaveBeenCalledTimes(0)
+  }
+
+  async testForcedClientErrorCaptured () {
+    await this.throwClientErr('client err B', { code: 403, force: true })
+    expect(mockCaptureException).toHaveBeenCalledTimes(1)
+    expect(capturedScopes[0].level).toBe('warning')
+    expect(capturedScopes[0].tags.status).toBe(403)
+  }
+
+  async testForcedClientErrorRespectsRateLimit () {
+    const opts = { code: 429, force: true, rateLimit: true, windowMs: 60_000 }
+    await this.throwClientErr('client err C', opts)
+    expect(mockCaptureException).toHaveBeenCalledTimes(1)
+    this.now += 1_000
+    await this.throwClientErr('client err C', opts)
+    expect(mockCaptureException).toHaveBeenCalledTimes(1) // suppressed
+  }
+
+  async testUnforcedClientErrorSkipsRateLimiter () {
+    // An unforced client error is never captured AND does not consume the
+    // rate limiter's budget...
+    await this.throwClientErr('client err D', { rateLimit: true, windowMs: 60_000 })
+    expect(mockCaptureException).toHaveBeenCalledTimes(0)
+    // ...so a forced report immediately after still goes out.
+    this.now += 1_000
+    await this.throwClientErr('client err D', { rateLimit: true, windowMs: 60_000, force: true })
+    expect(mockCaptureException).toHaveBeenCalledTimes(1)
+  }
+
+  testForceSentryReturnsSelfForChaining () {
+    const err = new EXCEPTIONS.RequestError('x', undefined, 400)
+    expect(err.forceSentry()).toBe(err)
+    expect(err._sentryForceReport).toBe(true)
+  }
+
+  async testThirdPartyStatusCodeErrorNormalizedTo500AndCaptured () {
+    // An error carrying a statusCode that was NOT thrown through our
+    // exception classes (e.g., a third-party HTTP client error that escaped
+    // uncaught) is normalized to a 500 crash by the API layer and always
+    // captured -- it must never be mistaken for an expected client error.
+    await this.app.post('/sentryRateLimited')
+      .send({ message: 'mailjet says no', code: 401, plain: true })
+      .expect(500)
+    await this.app.post('/sentryRateLimited')
+      .send({ message: 'boom', plain: true }) // no code -> defaults to 550
+      .expect(500)
+    expect(mockCaptureException).toHaveBeenCalledTimes(2)
+    expect(capturedScopes.every(s => s.level === 'error')).toBe(true)
+    expect(capturedScopes[0].tags.status).toBe(500)
+  }
+
+  async testFastifyInternalClientErrorStillCaptured () {
+    // fastify's own content-type error is not a RequestError either; it
+    // stays captured (with its custom fingerprint) as before.
+    await this.app.post('/sentryRateLimited')
+      .set('Content-Type', 'text/html')
+      .send('{}')
+      .expect(415)
+    expect(mockCaptureException).toHaveBeenCalledTimes(1)
+    expect(capturedScopes[0].fingerprint).toBe('Content-Type Not Permitted')
   }
 }
 

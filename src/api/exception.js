@@ -203,6 +203,24 @@ class RequestError extends __RequestDone {
     this._sentryRateLimitMs = windowMs
     return this
   }
+
+  /**
+   * Force this client error (status < 500) to be reported to Sentry. By
+   * default a RequestError below 500 is not reported: it is an expected
+   * outcome deliberately thrown by the app (access denied, bad input, etc.)
+   * whose reports would only consume the Sentry quota. (Crashes and errors
+   * not thrown through these exception classes are always reported.) The
+   * HTTP response and logs always include the error either way. Returns
+   * `this`, so it can be chained at the throw site:
+   *
+   *     throw new BadRequestException('suspicious input').forceSentry()
+   *
+   * @returns {RequestError} this
+   */
+  forceSentry () {
+    this._sentryForceReport = true
+    return this
+  }
 }
 
 /**

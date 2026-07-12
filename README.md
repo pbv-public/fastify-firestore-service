@@ -110,6 +110,17 @@ Any 500 HTTP response will be logged to Sentry if:
 * The `NODE_ENV` environment variable is not localhost
 * The service's logging configuration has the `sentryDSN` parameter set
 
+Deliberate client errors -- a `RequestError` (or subclass) with HTTP status
+< 500 -- are expected outcomes and are NOT reported to Sentry (they are
+still logged and returned to the caller as usual). To report one anyway,
+flag it at the throw site with
+`throw new BadRequestException('...').forceSentry()`. Any error NOT thrown
+through the exception classes is always reported, even if it carries a 4xx
+`statusCode` (e.g., a third-party HTTP client error that escaped uncaught),
+so unexpected errors can never be silently dropped. Errors that fire in
+bursts (e.g., during a dependency outage) can be throttled with
+`.rateLimitSentry(windowMs)`.
+
 The Sentry repo will include:
 * Information about the user like ID or IP, as well as their user agent header
 * Information about the request including HTTP method, URL and response code
