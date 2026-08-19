@@ -93,6 +93,7 @@ const PARAMS_CONFIG = {
   service: undefined,
   components: undefined,
   RegistrarCls: ComponentRegistrar,
+  trustedProxyHops: 1,
   cookie: {},
   healthCheck: {},
   latencyTracker: {},
@@ -124,6 +125,9 @@ function loadConfigDefault (config, defaultConfig) {
  *   components.
  * @param {object} [params.RegistrarCls=ComponentRegistrar] A subclass of
  *   ComponentRegistrar
+ * @param {number} [params.trustedProxyHops=1] How many proxies sit in front of
+ *   the service, which decides how much of X-Forwarded-For `req.ip` believes.
+ *   The default suits Cloud Run; raise it only if another proxy is added.
  * @param {CookieConfig} [params.cookie] Configures fastify-cookie.
  * @param {HealthCheckConfig} [params.healthCheck] Configures health check endpoint.
  * @param {LatencyTrackerConfig} [params.latencyTracker]
@@ -147,6 +151,7 @@ export default async function makeService (params = {}) {
     service,
     components,
     RegistrarCls,
+    trustedProxyHops,
     cookie,
     healthCheck,
     latencyTracker,
@@ -170,6 +175,14 @@ export default async function makeService (params = {}) {
   const app = fastify({
     disableRequestLogging: true,
     logger,
+    // Without this the socket peer is the proxy that terminated TLS, not the
+    // caller, so req.ip is useless -- on Cloud Run it is a Google front end.
+    //
+    // A hop count rather than `true`: the proxy appends the caller's real
+    // address to whatever X-Forwarded-For the caller sent, so the entries it
+    // added are the trustworthy ones and everything earlier is caller-supplied.
+    // `true` takes the leftmost, which lets any caller claim any address.
+    trustProxy: trustedProxyHops,
     genReqId: () => `${fastifyServerId}-${++requestCount}`
   })
     .setValidatorCompiler(({ httpPart, schema }) => {
