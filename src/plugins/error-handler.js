@@ -87,6 +87,21 @@ export default fp(function (fastify, options, next) {
       }
     }
 
+    // A crash surfacing from a shared library frame (an ORM helper, a
+    // transport client) stacks identically no matter which endpoint's bug
+    // caused it, so Sentry groups them all into one issue -- and then a single
+    // stale resolution on that issue hides every later one. Add the route so
+    // each endpoint keeps its own issue. Errors thrown from our own code are
+    // left on default grouping.
+    let libraryCrashFingerprint = false
+    if (isCrash && traceback[0]?.includes('/node_modules/')) {
+      // the registered path ('/user/tag'), not the request URL, so a query
+      // string cannot inflate the fingerprint
+      /* istanbul ignore next */
+      const route = req.routeOptions?.url ?? req.url
+      libraryCrashFingerprint = ['{{ default }}', route]
+    }
+
     Object.getOwnPropertyNames(error).forEach(key => {
       if (key !== 'stack' && key !== 'message') {
         if (!errInfo.error) {
@@ -129,6 +144,8 @@ export default fp(function (fastify, options, next) {
       Sentry.withScope(function (scope) {
         if (customFingerprint) {
           scope.setFingerprint(customFingerprint)
+        } else if (libraryCrashFingerprint) {
+          scope.setFingerprint(libraryCrashFingerprint)
         }
         const user = {}
         // istanbul ignore if

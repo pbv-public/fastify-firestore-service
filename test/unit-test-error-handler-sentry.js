@@ -124,6 +124,21 @@ class ErrorHandlerSentryRateLimitTest extends BaseTest {
     expect(err.rateLimitSentry(1234)._sentryRateLimitMs).toBe(1234)
   }
 
+  // Two different endpoints hitting the same ORM wrapper must not share an
+  // issue: one stale resolution on it would hide the other's bug.
+  async testLibraryCrashIsFingerprintedByRoute () {
+    await this.app.post('/sentryRateLimited')
+      .send({ message: 'wrapped err', libraryStack: true }).expect(500)
+    expect(mockCaptureException).toHaveBeenCalledTimes(1)
+    expect(capturedScopes[0].fingerprint).toEqual(
+      ['{{ default }}', '/sentryRateLimited'])
+  }
+
+  async testCrashFromOurOwnCodeKeepsDefaultGrouping () {
+    await this.throwErr('our own crash')
+    expect(capturedScopes[0].fingerprint).toBe(undefined)
+  }
+
   async testCrashCapturedAsErrorLevel () {
     await this.throwErr('crash err A')
     expect(mockCaptureException).toHaveBeenCalledTimes(1)

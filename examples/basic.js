@@ -321,13 +321,25 @@ class SentryRateLimitedAPI extends API {
     windowMs: S.int.min(0).optional(),
     code: S.int.min(300).optional(),
     force: S.bool.optional(),
-    plain: S.bool.optional()
+    plain: S.bool.optional(),
+    libraryStack: S.bool.optional()
   }
 
   static TAG = null
 
   async computeResponse () {
-    const { message, rateLimit, windowMs, code, force, plain } = this.req.body
+    const { message, rateLimit, windowMs, code, force, plain, libraryStack } = this.req.body
+    if (libraryStack) {
+      // simulates an error surfaced from a shared library frame, where every
+      // caller's bug stacks the same way
+      const err = new Error(message)
+      err.stack = [
+        `Error: ${message}`,
+        '    at parseFirestoreError (/app/node_modules/@pbvision/firestore-orm/src/context.js:673:14)',
+        '    at Context.__run (/app/node_modules/@pbvision/firestore-orm/src/context.js:548:32)'
+      ].join('\n')
+      throw err
+    }
     if (plain) {
       // simulates a third-party error that carries an HTTP-ish statusCode
       // but was not thrown through our exception classes
