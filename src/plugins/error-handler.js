@@ -187,9 +187,17 @@ export default fp(function (fastify, options, next) {
       })
     }
 
+    // A crash's message is for our logs, not for the caller: it holds whatever
+    // the failing code had in hand. firestore-orm's read-only-write error, for
+    // one, quotes the whole model it tried to save, secrets included. So only
+    // errors thrown on purpose (respData) and client errors pass their message
+    // through. The class name is kept since it carries no data and clients
+    // may test it (e.g., to retry a TransactionFailedError).
     const errorData = error.respData ?? {
       code: error.constructor.name,
-      message: customFingerprint || error.message
+      message: isCrash
+        ? 'internal server error'
+        : customFingerprint || error.message
     }
 
     // istanbul ignore else
